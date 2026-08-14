@@ -1,0 +1,12 @@
+[package]
+name = "typst-mode"
+version = "0.1.0"
+entrypoint = "lib/_lib.typ/lib.typ"
+authors = ["GitHub@Mujjiu555"]
+license = "Apache-2.0"
+description = ""
+homepage = ""
+repository = "https://github.com/mujiu555/typst-mode"
+keywords = ["enhancement"]
+
+[tool]
