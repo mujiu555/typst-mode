@@ -1,7 +1,9 @@
+#import "@preview/uuidkit:0.1.0": namespaces, v3
+
 // Structural type match: `t` is the expected type, `v` the actual value.
 // Raw types (`int`, `str`, ...) match against `type(v)`; record types match
 // against the type stored in a value's `_type`.
-#let _match = (t, v) => {
+#let _match(t, v) = {
   let tv = type(v)
   if type(t) == type {
     // a raw type such as `int` or `str`: compare directly
@@ -18,6 +20,14 @@
 // with a matching type. Extra fields on `other` are allowed (asymmetric /
 // structural-subtype behaviour).
 #let _compare(self, other) = {
+  if other == none {
+    // Treat none as Any
+    return true
+  }
+  assert(type(other) != type)
+  if self._type_id == other._type_id {
+    return true
+  }
   let same = true
   for (name, t) in self._fields {
     let ot = other._fields.at(name, default: auto)
@@ -46,7 +56,7 @@
   self + m
 }
 
-#let _new(self, ..rest) = {
+#let _new_record(self, ..rest) = {
   let instance = (_type: self)
 
   for (f, ty) in self._fields {
@@ -71,7 +81,7 @@
 
 // Copy-and-replace update: validate every field of `instance`, then construct
 // a new instance overriding the given fields.
-#let _update(self, instance, ..rest) = {
+#let _update_record(self, instance, ..rest) = {
   let newobj = (:)
 
   for (k, expected-type) in self._fields {
@@ -81,13 +91,13 @@
     newobj.insert(k, value)
   }
 
-  (self.new)(..(newobj + arguments.named(rest)))
+  (self.new)(..newobj, ..rest)
 }
 
 #let _record_built-ins = (
   compare: _compare,
-  new: _new,
-  update: _update,
+  new: _new_record,
+  update: _update_record,
 )
 
 /// Defines a record
@@ -96,7 +106,7 @@
 ///
 /// ```typst
 /// #let Adder = record(
-///   fields: (x: Int),
+///   x: Int,
 /// )
 /// ```
 ///
@@ -113,10 +123,11 @@
 ///
 /// - fields (dictionary): field-type pairs
 #let record(..fields) = {
-  let _description = arguments.pos(fields).join()
+  let _description = arguments.pos(fields).join("\n")
   let _fields = arguments.named(fields)
 
   let ty = (
+    _type_id: v3(namespaces.oid, repr(fields)),
     _fields: _fields,
     _methods: (:),
     description: _description,
@@ -147,6 +158,59 @@
   ty + _fetch_method(ty, this_call, _record_built-ins.keys())
 }
 
-#let enum = (variants: (:), description, new) => {
-  // TODO:
+#let _raw_register(self, name, ..rest) = {
+  let var = (
+    record(
+      ..rest,
+    )
+      + (
+        _parent: self,
+      )
+  )
+  self._payloads.insert(name, var)
+
+  let fn = (self, ..rest) => {
+    (self.new)(variant: name, payload: (var.new)(..rest))
+  }
+
+  let this_call(method) = {
+    assert(fn != auto)
+    (..rest) => fn(_fetch_method(self, this_call, (name,)), ..rest)
+  }
+  let extended = self + _fetch_method(self, this_call, (name,))
+  extended + (register: (..args) => _raw_register(extended, ..args))
+}
+
+
+#let _enum_built-ins = (
+  _register: _raw_register,
+)
+
+#let enum(..rest) = {
+  let description = arguments.pos(rest)
+  let variants = arguments.named(rest)
+
+  let ty = (
+    record(
+      ..description,
+      variant: str,
+      payload: dictionary,
+    )
+      + (
+        _payloads: (:),
+      )
+  )
+
+
+  for (name, fields) in variants {
+    let this_call(method) = {
+      let fn = _enum_built-ins.at(method, default: auto)
+      assert(fn != auto)
+      (..rest) => fn(_fetch_method(ty, this_call, _enum_built-ins.keys()), ..rest)
+    }
+    ty = ty + _fetch_method(ty, this_call, _enum_built-ins.keys())
+    ty = (ty._register)(name, ..fields)
+  }
+
+  ty
 }
