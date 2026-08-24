@@ -5,7 +5,9 @@
 // against the type stored in a value's `_type`.
 #let _match(t, v) = {
   let tv = type(v)
-  if type(t) == type {
+  if t == none {
+    true
+  } else if type(t) == type {
     // a raw type such as `int` or `str`: compare directly
     t == tv
   } else if tv == dictionary and dictionary.keys(v).contains("_type") {
@@ -20,10 +22,6 @@
 // with a matching type. Extra fields on `other` are allowed (asymmetric /
 // structural-subtype behaviour).
 #let _compare(self, other) = {
-  if other == none {
-    // Treat none as Any
-    return true
-  }
   assert(type(other) != type)
   if self._type_id == other._type_id {
     return true
@@ -61,7 +59,7 @@
 
   for (f, ty) in self._fields {
     let v = rest.at(f, default: none)
-    assert(v != none)
+    assert(v != none, message: "field `" + f + "`: not exist")
     assert(_match(ty, v))
     instance.insert(f, v)
   }
@@ -164,7 +162,7 @@
       ..rest,
     )
       + (
-        _parent: self,
+        _parent: self._type_id,
       )
   )
   self._payloads.insert(name, var)
@@ -201,7 +199,6 @@
       )
   )
 
-
   for (name, fields) in variants {
     let this_call(method) = {
       let fn = _enum_built-ins.at(method, default: auto)
@@ -214,3 +211,4 @@
 
   ty
 }
+
