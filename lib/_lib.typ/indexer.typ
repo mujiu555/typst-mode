@@ -14,24 +14,28 @@
   content: content,
 )
 
-#let indexer = impl(
+#let _indexer = impl(
   _indexer,
   lookup: (self, content) => context link(self.loc, content),
 )
 
 #let mkindex(label, content) = context {
-  let index = (indexer.new)(
+  let loc = here()
+  let index = (_indexer.new)(
     label: label,
-    loc: here(),
+    loc: loc,
     content: content,
   )
+  let cont = (_global.get)()
+  assert(not label in cont, message: "EROOR: duplicate label: `" + label + "`")
+
   (_global.update)(
-    (_global.get)() + ((label): index),
+    cont + ((label): index),
   )
-  content
 }
 
 #let lookup(label, content) = context {
   let cont = (_global.get)()
   (cont.at(label).lookup)(content)
 }
+

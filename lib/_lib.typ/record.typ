@@ -25,14 +25,20 @@
 // with a matching type. Extra fields on `other` are allowed (asymmetric /
 // structural-subtype behaviour).
 #let _compare(self, other) = {
-  assert(type(other) != type)
+  assert(
+    type(other) != type,
+    message: "value `" + other + "` is not a record, can only compare between records",
+  )
   if self._type_id == other._type_id {
     return true
   }
   let same = true
   for (name, t) in self._fields {
     let ot = other._fields.at(name, default: auto)
-    assert(ot != auto)
+    if (ot == auto) {
+      same = false
+      break
+    }
     same = (
       same
         and if type(t) == type {
@@ -48,13 +54,20 @@
   same
 }
 
-// NOTE: adopt form typsy
 #let _fetch_method(self, fn, methods) = {
   let m = (:)
   for name in methods {
     m.insert(name, fn(name))
   }
   self + m
+}
+
+#let _get_fields_record(self) = {
+  let out = (:)
+  for (n, t) in self._type._fields {
+    out.insert(n, self.at(n))
+  }
+  out
 }
 
 #let _new_record(self, ..rest) = {
@@ -71,7 +84,7 @@
   }
 
   for (m, (name: name, type: ty, fn: fn)) in self._methods {
-    assert(fn != none)
+    assert(fn != none, "must provide a method")
     instance.insert(m, fn)
   }
 
@@ -89,8 +102,8 @@
   let newobj = (:)
 
   for (k, expected-type) in self._fields {
-    let value = instance.at(k, default: none)
-    assert(value != none)
+    let value = instance.at(k, default: auto)
+    assert(value != auto)
     assert(_match(expected-type, value))
     newobj.insert(k, value)
   }
@@ -98,10 +111,17 @@
   (self.new)(..newobj, ..rest)
 }
 
+#let _with_record(self, ..rest) = {
+  (..args) => {
+    (self.new)(..rest, ..args)
+  }
+}
+
 #let _record_built-ins = (
   compare: _compare,
   new: _new_record,
   update: _update_record,
+  with: _with_record,
 )
 
 /// Defines a record
@@ -133,7 +153,7 @@
   let ty = (
     _type_id: _record_uuid(repr(fields)),
     _fields: _fields,
-    _methods: (:),
+    _methods: (fields: (name: "fields", type: none, fn: _get_fields_record)),
     description: _description,
   )
   let this_call(method) = {
