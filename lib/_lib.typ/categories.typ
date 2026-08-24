@@ -3,7 +3,7 @@
 
 // Tagged union: `variant` selects the publication type, `content` carries
 // the type-specific fields.
-#let Category = enum(
+#let category = enum(
   "Publication category",
   journal: (
     journal: str,
@@ -41,11 +41,3 @@
     series: str,
   ),
 )
-
-
-
-
-
-
-
-
