@@ -3,3 +3,6 @@ package-lock.json
 package.json
 
 *.pdf
+
+.direnv/
+tmp/

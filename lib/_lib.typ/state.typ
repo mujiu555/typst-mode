@@ -11,13 +11,13 @@
   self.default
 }
 
-#let State = record(
+#let _state = record(
   sym: function,
   default: none,
 )
 
-#let State = impl(
-  State,
+#let _state = impl(
+  _state,
   at: (self, loc) => {
     _at(self, _global.at(loc))
   },
@@ -31,7 +31,7 @@
     let new = ()
     let found = false
     for (key, val) in _global.at(here()) {
-      if key == self.symbol {
+      if key == self.sym {
         new.push((key, value))
         found = true
       } else {
@@ -39,7 +39,7 @@
       }
     }
     if not found {
-      new.push((self.symbol, value))
+      new.push((self.sym, value))
     }
     _global.update(new)
   },

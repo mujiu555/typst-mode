@@ -1,5 +1,8 @@
 #import "@preview/uuidkit:0.1.0": namespaces, v3
 
+#let _ns_record = v3(namespaces.oid, "e2487d38-8caa-481f-9a15-a7a3853e1d72")
+#let _record_uuid(name) = v3(_ns_record, name)
+
 // Structural type match: `t` is the expected type, `v` the actual value.
 // Raw types (`int`, `str`, ...) match against `type(v)`; record types match
 // against the type stored in a value's `_type`.
@@ -60,7 +63,10 @@
   for (f, ty) in self._fields {
     let v = rest.at(f, default: none)
     assert(v != none, message: "field `" + f + "`: not exist")
-    assert(_match(ty, v))
+    assert(
+      _match(ty, v),
+      message: "field `" + f + "`:" + "`" + repr(ty) + "` do not match `" + repr(v) + "`",
+    )
     instance.insert(f, v)
   }
 
@@ -125,7 +131,7 @@
   let _fields = arguments.named(fields)
 
   let ty = (
-    _type_id: v3(namespaces.oid, repr(fields)),
+    _type_id: _record_uuid(repr(fields)),
     _fields: _fields,
     _methods: (:),
     description: _description,

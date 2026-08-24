@@ -40,4 +40,7 @@
     site: str,
     series: str,
   ),
+  null: (),
 )
+
+#let category = category + (null: (category.null)())
