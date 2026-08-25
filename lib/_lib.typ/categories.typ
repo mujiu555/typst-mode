@@ -1,3 +1,8 @@
+// typst-mode: categories.typ
+// Publication-category taxonomy, defined as an `enum` (tagged union, see
+// record.typ). A `category` value has `variant` — which category it is —
+// plus a `payload` holding that variant's fields. For example a journal
+// article is `category.journal(journal: ..., volume: ..., ...)`.
 
 #import "record.typ": enum, impl, record
 
@@ -43,4 +48,7 @@
   null: (),
 )
 
+// Re-bind `category.null` from the null-variant *constructor* to a
+// ready-made null *instance*, so `category.null` can be used directly as
+// the default "no category" value (see `meta`'s default in meta.typ).
 #let category = category + (null: (category.null)())

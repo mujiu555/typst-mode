@@ -8,10 +8,12 @@
 
 ### Referencing
 
-### Credit
+### Credit: Code/Library
 
-[Typsy](https://github.com/patrick-kidger/typsy):
-License: Apache v2, no NOTICE provided
+1. [Typsy](https://github.com/patrick-kidger/typsy):
+  License: Apache v2, no NOTICE provided
+2. [digestify](https://github.com/ParaN3xus/digestify.git):
+  License: MIT, no NOTICE provided
 
 ## Structure
 
@@ -59,4 +61,3 @@ Make Pr if you have found any problem or have method to improve those notes.
 ## License
 
 Apache License ver. 2.
-

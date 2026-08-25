@@ -1,13 +1,27 @@
-#import "@preview/uuidkit:0.1.0": namespaces, v3
+// typst-mode: meta.typ
+// Document metadata system.
+//
+// `meta(...)` declares a document: it builds a `_Core_doc` record from the
+// given metadata, stamps it with a UUID-derived `did`, attaches it to any
+// tags, registers it in the `documents` store, and makes it the `current`
+// document. Documents are referenced by id elsewhere (e.g. by tag.typ and
+// by a future bibliography/record layer).
 
-#import "record.typ": record
+#import "uid.typ": namespaces, v3
+
+#import "record.typ": enum, record
 #import "categories.typ": category
 #import "tag.typ": tag
 #import "state.typ": _state
 
+// UUID namespace for documents: `_doc_uuid(name)` turns a document name
+// into a deterministic v3 UUID, giving every document a stable, unique id.
 #let _ns_doc = v3(namespaces.oid, "aa6f42d8-5c10-49a9-985f-cad16abd219b")
 #let _doc_uuid(name) = v3(_ns_doc, name)
 
+// Global stores (see state.typ):
+//   documents — id -> `_Core_doc` map of every declared document
+//   current   — the most recently declared document
 #let documents = (_state.new)(
   sym: () => {},
   default: (:),
@@ -18,6 +32,8 @@
   default: (),
 )
 
+// Author schema (not yet validated/used by `meta`, kept for the record
+// layer).
 #let Author = record(
   name: str,
   affiliation: str,
@@ -25,6 +41,13 @@
   orcid: str,
 )
 
+#let image = enum(
+  path: (p: str),
+  null: (),
+)
+#let image = image + (null: (image.null)())
+
+// The metadata schema: the core fields a `meta` document carries.
 #let _Core_doc = record(
   "Metadata: [Core]",
   id: str,
@@ -43,6 +66,7 @@
   license: str,
 
   description: str,
+  cover_image: image,
 
   category: category,
 
@@ -53,6 +77,10 @@
   loc: location,
 )
 
+// Declare a document. Most arguments map 1:1 onto `_Core_doc` fields and
+// carry sensible defaults; only `id` is really expected from the caller.
+// A `context` block is required because registering with tags and updating
+// the stores both touch Typst state.
 #let meta(
   id: none,
   parent_id: none,
@@ -99,12 +127,16 @@
 
     loc: here(),
   )
+  // Attach the document to every tag it lists
   for t in tags {
     (t.add-doc)(doc)
   }
 
+  // Register under its id, and make it the current document
+  let dc = (documents.get)()
+  assert(not id in dc, message: "ERROR: duplicate document id: `" + id + "`")
   (documents.update)(
-    (documents.get)() + ((id): doc),
+    dc + ((id): doc),
   )
 
   (current.update)(

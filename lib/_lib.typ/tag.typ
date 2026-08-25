@@ -1,11 +1,20 @@
+// typst-mode: tag.typ
+// Hierarchical tag system. Tags form a tree: `register` creates a root tag
+// plus one child per given name, and `sub` grows further children. Each tag
+// tracks the documents attached to it via its own `_state` slot.
+
 #import "record.typ": _fetch_method, impl, record
 #import "state.typ": _state
 
-#import "@preview/uuidkit:0.1.0": namespaces, v3
+#import "uid.typ": namespaces, v3
 
+// UUID namespace for tags, mirroring the scheme used in meta.typ.
 #let _ns_tag = v3(namespaces.oid, "ac562613-54f4-4584-8ea4-1401df8d1ed2")
 #let _tag_uuid(name) = v3(_ns_tag, name)
 
+// A tag: `_parent` is the id of its parent ("" for the root), `id`/`name`
+// identify it, `documents` is a `_state` slot accumulating attached
+// document ids.
 #let tag = record(
   _parent: str,
   id: str,
@@ -15,22 +24,32 @@
 
 #let tag = impl(
   tag,
+  // Create a child tag under this one. The child gets a fresh, empty
+  // `documents` slot so it tracks its own documents. `self._type.new` (rather
+  // than a captured `tag.new`) keeps the child wired to the *full* tag type —
+  // a closure defined before `impl` finishes would otherwise capture the
+  // bare, method-less type.
   sub: (self, name) => {
-    (tag.new)(
+    (self._type.new)(
       _parent: self.id,
       id: _tag_uuid(name),
       name: name,
-      documents: (_state.new)(sym: () => {}, default: ()),
+      documents: (_state.new)(sym: () => {}, default: (:)),
     )
   },
-  add-doc: (self, id) => context {
-    (self.documents.update)(
-      (self.documents.get)() + (id,),
-    )
+  // Attach a document to this tag. `documents` is a dictionary keyed by
+  // document id, so attaching the same document again is a no-op — necessary
+  // because meta re-runs during layout passes, and re-reading the slot at the
+  // same location can return a stale value.
+  add-doc: (self, doc) => context {
+    let cur = (self.documents.get)()
+    cur.insert(doc.id, doc)
+    (self.documents.update)(cur)
   },
 )
 
-// super wired usage:
+// "super wired" usage: `register` creates a root tag and one child per
+// given name, and returns them as a positional list.
 // ```txt
 // #let (
 //   root,
@@ -50,7 +69,7 @@
           _parent: "",
           id: "root",
           name: "root",
-          documents: (_state.new)(sym: () => {}, default: ()),
+          documents: (_state.new)(sym: () => {}, default: (:)),
         )
         let out = (root,)
         for t in tags {
