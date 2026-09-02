@@ -4,7 +4,7 @@
 // tracks the documents attached to it via its own `_state` slot.
 
 #import "record.typ": _fetch_method, impl, record
-#import "state.typ": _state
+#import "state.typ": _mkstate, _state
 
 #import "uid.typ": namespaces, v3
 
@@ -34,7 +34,7 @@
       _parent: self.id,
       id: _tag_uuid(name),
       name: name,
-      documents: (_state.new)(sym: () => {}, default: (:)),
+      documents: mk("a61f608d-7f35-4ff9-a9a6-65ba40dffc2f", (:)),
     )
   },
   // Attach a document to this tag. `documents` is a dictionary keyed by
@@ -45,6 +45,9 @@
     let cur = (self.documents.get)()
     cur.insert(doc.id, doc)
     (self.documents.update)(cur)
+  },
+  get-doc: self => {
+    (self.documents.get)()
   },
 )
 
@@ -69,7 +72,7 @@
           _parent: "",
           id: "root",
           name: "root",
-          documents: (_state.new)(sym: () => {}, default: (:)),
+          documents: _mkstate(tags.join("-") + "f8480bdb-6c76-44b5-a0a3-211e55105521", (:)),
         )
         let out = (root,)
         for t in tags {

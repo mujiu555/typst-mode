@@ -10,9 +10,7 @@
 
 ### Credit: Code/Library
 
-1. [Typsy](https://github.com/patrick-kidger/typsy):
-  License: Apache v2, no NOTICE provided
-2. [digestify](https://github.com/ParaN3xus/digestify.git):
+1. [digestify](https://github.com/ParaN3xus/digestify.git):
   License: MIT, no NOTICE provided
 
 ## Structure

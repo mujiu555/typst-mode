@@ -17,7 +17,7 @@
 //     and the tag attachment is lost). Multi-document behaviour without tags
 //     is covered in `tests/meta/multi.typ`.
 
-#import "/lib/_lib.typ/meta.typ": _doc_uuid, current, documents, meta
+#import "/lib/_lib.typ/meta.typ": _doc_uuid, article_meta, current, documents
 #import "/lib/_lib.typ/tag.typ": tag
 
 #set page(margin: 2cm)
@@ -32,7 +32,7 @@
 
 #let (root, ta, tb) = (tag.register)("alpha", "beta")
 
-#(meta)(
+#(article_meta)(
   id: "doc-a",
   parent_id: "root",
   title: [Doc A],

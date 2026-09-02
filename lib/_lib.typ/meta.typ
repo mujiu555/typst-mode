@@ -8,11 +8,10 @@
 // by a future bibliography/record layer).
 
 #import "uid.typ": namespaces, v3
-
 #import "record.typ": enum, record
 #import "categories.typ": category
 #import "tag.typ": tag
-#import "state.typ": _state
+#import "state.typ": _mkstate, _state
 
 // UUID namespace for documents: `_doc_uuid(name)` turns a document name
 // into a deterministic v3 UUID, giving every document a stable, unique id.
@@ -22,19 +21,19 @@
 // Global stores (see state.typ):
 //   documents — id -> `_Core_doc` map of every declared document
 //   current   — the most recently declared document
-#let documents = (_state.new)(
-  sym: () => {},
-  default: (:),
+#let documents = _mkstate(
+  "f12cabee-4a71-4049-b99a-e91e4bb8ee32",
+  (:),
 )
 
-#let current = (_state.new)(
-  sym: () => {},
-  default: (),
+#let current = _mkstate(
+  "4425dff9-79cf-48e7-8868-1a99688d1635",
+  (:),
 )
 
 // Author schema (not yet validated/used by `meta`, kept for the record
 // layer).
-#let Author = record(
+#let author = record(
   name: str,
   affiliation: str,
   email: str,
@@ -48,7 +47,7 @@
 #let image = image + (null: (image.null)())
 
 // The metadata schema: the core fields a `meta` document carries.
-#let _Core_doc = record(
+#let _core_doc = record(
   "Metadata: [Core]",
   id: str,
   parent_id: str,
@@ -78,12 +77,9 @@
 )
 
 // Declare a document. Most arguments map 1:1 onto `_Core_doc` fields and
-// carry sensible defaults; only `id` is really expected from the caller.
-// A `context` block is required because registering with tags and updating
-// the stores both touch Typst state.
 #let meta(
   id: none,
-  parent_id: none,
+  parent_id: "index",
   //
   title: none,
   authors: none,
@@ -101,7 +97,7 @@
   tags: (),
   tlb: (:),
 ) = context {
-  let doc = (_Core_doc.new)(
+  let doc = (_core_doc.new)(
     id: id,
     parent_id: parent_id,
     did: _doc_uuid(id),
