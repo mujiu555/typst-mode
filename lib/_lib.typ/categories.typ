@@ -4,48 +4,49 @@
 // plus a `payload` holding that variant's fields. For example a journal
 // article is `category.journal(journal: ..., volume: ..., ...)`.
 
-#import "record.typ": enum, impl, record
+#import "record.typ": impl_record, record
+#import "enum.typ": enum
 
 // Tagged union: `variant` selects the publication type, `content` carries
 // the type-specific fields.
 #let category = enum(
   "Publication category",
-  journal: (
+  journal: record(
     journal: str,
     volume: int,
     issue: int,
     pages: str,
   ),
-  conference: (
+  conference: record(
     conference: str,
     proceedings: str,
   ),
-  book: (
+  book: record(
     publisher: str,
     isbn: str,
     edition: str,
   ),
-  bookChapter: (
+  bookChapter: record(
     book: str,
     pages: str,
   ),
-  thesis: (
+  thesis: record(
     degree: str,
     university: str,
   ),
-  report: (
+  report: record(
     institution: str,
     number: str,
   ),
-  preprint: (
+  preprint: record(
     repository: str,
     platform: str,
   ),
-  blogPost: (
+  blogPost: record(
     site: str,
     series: str,
   ),
-  null: (),
+  null: record(),
 )
 
 // Re-bind `category.null` from the null-variant *constructor* to a

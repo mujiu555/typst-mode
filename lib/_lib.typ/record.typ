@@ -1,4 +1,4 @@
-// typst-mode: record.typ
+/ypst-mode: record.typ
 // A small structural type-system built on top of plain Typst dictionaries.
 //
 // A *record type* is a dictionary carrying three private keys:
@@ -108,7 +108,7 @@
 
   for (f, ty) in self._fields {
     let v = rest.at(f, default: none)
-    assert(v != none, message: "field `" + f + "`: not exist")
+    assert(v != none, message: "field `" + f + "`: not exist:" + repr(rest))
     assert(
       _match(ty, v),
       message: "field `" + f + "`:" + "`" + repr(ty) + "` do not match `" + repr(v) + "`",
@@ -214,7 +214,7 @@
 // directly on the type. Built-ins are re-bound at the end so `self` still
 // resolves to the extended type.
 // This implementation makes rebind (decorate) method possible
-#let impl(ty, ..fns) = {
+#let impl_record(ty, ..fns) = {
   let fns = arguments.named(fns)
 
   for (name, fn) in fns {
@@ -230,72 +230,4 @@
     (..rest) => fn(_fetch_method(ty, this_call, _record_built-ins.keys()), ..rest)
   }
   ty + _fetch_method(ty, this_call, _record_built-ins.keys())
-}
-
-// Register one enum variant on the type `self`.
-// - builds a sub-record type for the variant's fields, tagged with the
-//   parent's `_type_id` as `_parent`,
-// - stashes it in `self._payloads[name]`,
-// - defines a constructor `(self, ..rest) => self.new(variant: name,
-//   payload: <sub-record instance>)`,
-// - re-exposes `register` on the extended type so further variants can be
-//   added incrementally.
-#let _raw_register(self, name, ..rest) = {
-  let var = (
-    record(
-      ..rest,
-    )
-      + (
-        _parent: self._type_id,
-      )
-  )
-  self._payloads.insert(name, var)
-
-  let fn = (self, ..rest) => {
-    (self.new)(variant: name, payload: (var.new)(..rest))
-  }
-
-  let this_call(method) = {
-    assert(fn != auto)
-    (..rest) => fn(_fetch_method(self, this_call, (name,)), ..rest)
-  }
-  let extended = self + _fetch_method(self, this_call, (name,))
-  extended + (register: (..args) => _raw_register(extended, ..args))
-}
-
-
-#let _enum_built-ins = (
-  _register: _raw_register,
-)
-
-// `enum` builds a tagged union (sum type): a record with `variant: str`
-// and `payload: dictionary`, plus one registered constructor per variant.
-// Constructors are invoked as `(ty.<variant>)(..fields)` and produce an
-// instance carrying `variant = "<name>"` and the variant-specific payload.
-#let enum(..rest) = {
-  let description = arguments.pos(rest)
-  let variants = arguments.named(rest)
-
-  let ty = (
-    record(
-      ..description,
-      variant: str,
-      payload: dictionary,
-    )
-      + (
-        _payloads: (:),
-      )
-  )
-
-  for (name, fields) in variants {
-    let this_call(method) = {
-      let fn = _enum_built-ins.at(method, default: auto)
-      assert(fn != auto)
-      (..rest) => fn(_fetch_method(ty, this_call, _enum_built-ins.keys()), ..rest)
-    }
-    ty = ty + _fetch_method(ty, this_call, _enum_built-ins.keys())
-    ty = (ty._register)(name, ..fields)
-  }
-
-  ty
 }

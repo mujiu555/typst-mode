@@ -1,4 +1,5 @@
-#import "record.typ": enum, impl, record
+#import "record.typ": impl_record, record
+#import "enum.typ": enum, impl_enum
 #import "meta.typ": _core_doc
 #import "uid.typ": namespaces, v3
 #import "state.typ": _mkstate
@@ -11,617 +12,266 @@
   (:),
 )
 
-#let page_info = record(
-  width: length,
-  height: length,
-  margin_left: length,
-  margin_right: length,
-  margin_top: length,
-  margin_bottom: length,
-)
-
-#let page_info = (
-  page_info
-    + {
-      let a0 = (page_info.new)(
-        width: 841mm,
-        height: 1189mm,
-        margin_left: 100.1mm,
-        margin_right: 100.1mm,
-        margin_top: 100.1mm,
-        margin_bottom: 100.1mm,
-      )
-      let a1 = (page_info.new)(
-        width: 594mm,
-        height: 841mm,
-        margin_left: 70.7mm,
-        margin_right: 70.7mm,
-        margin_top: 70.7mm,
-        margin_bottom: 70.7mm,
-      )
-      let a2 = (page_info.new)(
-        width: 420mm,
-        height: 594mm,
-        margin_left: 50mm,
-        margin_right: 50mm,
-        margin_top: 50mm,
-        margin_bottom: 50mm,
-      )
-      let a3 = (page_info.new)(
-        width: 297mm,
-        height: 420mm,
-        margin_left: 35.4mm,
-        margin_right: 35.4mm,
-        margin_top: 35.4mm,
-        margin_bottom: 35.4mm,
-      )
-      let a4 = (page_info.new)(
-        width: 210mm,
-        height: 297mm,
-        margin_left: 25mm,
-        margin_right: 25mm,
-        margin_top: 25mm,
-        margin_bottom: 25mm,
-      )
-      let a5 = (page_info.new)(
-        width: 148mm,
-        height: 210mm,
-        margin_left: 17.6mm,
-        margin_right: 17.6mm,
-        margin_top: 17.6mm,
-        margin_bottom: 17.6mm,
-      )
-      let a6 = (page_info.new)(
-        width: 105mm,
-        height: 148mm,
-        margin_left: 12.5mm,
-        margin_right: 12.5mm,
-        margin_top: 12.5mm,
-        margin_bottom: 12.5mm,
-      )
-      let a7 = (page_info.new)(
-        width: 74mm,
-        height: 105mm,
-        margin_left: 8.8mm,
-        margin_right: 8.8mm,
-        margin_top: 8.8mm,
-        margin_bottom: 8.8mm,
-      )
-      let a8 = (page_info.new)(
-        width: 52mm,
-        height: 74mm,
-        margin_left: 6.2mm,
-        margin_right: 6.2mm,
-        margin_top: 6.2mm,
-        margin_bottom: 6.2mm,
-      )
-      let a9 = (page_info.new)(
-        width: 37mm,
-        height: 52mm,
-        margin_left: 4.4mm,
-        margin_right: 4.4mm,
-        margin_top: 4.4mm,
-        margin_bottom: 4.4mm,
-      )
-      let a10 = (page_info.new)(
-        width: 26mm,
-        height: 37mm,
-        margin_left: 3.1mm,
-        margin_right: 3.1mm,
-        margin_top: 3.1mm,
-        margin_bottom: 3.1mm,
-      )
-
-      let b0 = (page_info.new)(
-        width: 1000mm,
-        height: 1414mm,
-        margin_left: 119.0mm,
-        margin_right: 119.0mm,
-        margin_top: 119.0mm,
-        margin_bottom: 119.0mm,
-      )
-      let b1 = (page_info.new)(
-        width: 707mm,
-        height: 1000mm,
-        margin_left: 84.2mm,
-        margin_right: 84.2mm,
-        margin_top: 84.2mm,
-        margin_bottom: 84.2mm,
-      )
-      let b2 = (page_info.new)(
-        width: 500mm,
-        height: 707mm,
-        margin_left: 59.5mm,
-        margin_right: 59.5mm,
-        margin_top: 59.5mm,
-        margin_bottom: 59.5mm,
-      )
-      let b3 = (page_info.new)(
-        width: 353mm,
-        height: 500mm,
-        margin_left: 42.0mm,
-        margin_right: 42.0mm,
-        margin_top: 42.0mm,
-        margin_bottom: 42.0mm,
-      )
-      let b4 = (page_info.new)(
-        width: 250mm,
-        height: 353mm,
-        margin_left: 29.8mm,
-        margin_right: 29.8mm,
-        margin_top: 29.8mm,
-        margin_bottom: 29.8mm,
-      )
-      let b5 = (page_info.new)(
-        width: 176mm,
-        height: 250mm,
-        margin_left: 21.0mm,
-        margin_right: 21.0mm,
-        margin_top: 21.0mm,
-        margin_bottom: 21.0mm,
-      )
-      let b6 = (page_info.new)(
-        width: 125mm,
-        height: 176mm,
-        margin_left: 14.9mm,
-        margin_right: 14.9mm,
-        margin_top: 14.9mm,
-        margin_bottom: 14.9mm,
-      )
-      let b7 = (page_info.new)(
-        width: 88mm,
-        height: 125mm,
-        margin_left: 10.5mm,
-        margin_right: 10.5mm,
-        margin_top: 10.5mm,
-        margin_bottom: 10.5mm,
-      )
-      let b8 = (page_info.new)(
-        width: 62mm,
-        height: 88mm,
-        margin_left: 7.4mm,
-        margin_right: 7.4mm,
-        margin_top: 7.4mm,
-        margin_bottom: 7.4mm,
-      )
-      let b9 = (page_info.new)(
-        width: 44mm,
-        height: 62mm,
-        margin_left: 5.2mm,
-        margin_right: 5.2mm,
-        margin_top: 5.2mm,
-        margin_bottom: 5.2mm,
-      )
-      let b10 = (page_info.new)(
-        width: 31mm,
-        height: 44mm,
-        margin_left: 3.7mm,
-        margin_right: 3.7mm,
-        margin_top: 3.7mm,
-        margin_bottom: 3.7mm,
-      )
-
-      let c0 = (page_info.new)(
-        width: 917mm,
-        height: 1297mm,
-        margin_left: 109.2mm,
-        margin_right: 109.2mm,
-        margin_top: 109.2mm,
-        margin_bottom: 109.2mm,
-      )
-      let c1 = (page_info.new)(
-        width: 648mm,
-        height: 917mm,
-        margin_left: 77.1mm,
-        margin_right: 77.1mm,
-        margin_top: 77.1mm,
-        margin_bottom: 77.1mm,
-      )
-      let c2 = (page_info.new)(
-        width: 458mm,
-        height: 648mm,
-        margin_left: 54.5mm,
-        margin_right: 54.5mm,
-        margin_top: 54.5mm,
-        margin_bottom: 54.5mm,
-      )
-      let c3 = (page_info.new)(
-        width: 324mm,
-        height: 458mm,
-        margin_left: 38.6mm,
-        margin_right: 38.6mm,
-        margin_top: 38.6mm,
-        margin_bottom: 38.6mm,
-      )
-      let c4 = (page_info.new)(
-        width: 229mm,
-        height: 324mm,
-        margin_left: 27.3mm,
-        margin_right: 27.3mm,
-        margin_top: 27.3mm,
-        margin_bottom: 27.3mm,
-      )
-      let c5 = (page_info.new)(
-        width: 162mm,
-        height: 229mm,
-        margin_left: 19.3mm,
-        margin_right: 19.3mm,
-        margin_top: 19.3mm,
-        margin_bottom: 19.3mm,
-      )
-      let c6 = (page_info.new)(
-        width: 114mm,
-        height: 162mm,
-        margin_left: 13.6mm,
-        margin_right: 13.6mm,
-        margin_top: 13.6mm,
-        margin_bottom: 13.6mm,
-      )
-      let c7 = (page_info.new)(
-        width: 81mm,
-        height: 114mm,
-        margin_left: 9.6mm,
-        margin_right: 9.6mm,
-        margin_top: 9.6mm,
-        margin_bottom: 9.6mm,
-      )
-      let c8 = (page_info.new)(
-        width: 57mm,
-        height: 81mm,
-        margin_left: 6.8mm,
-        margin_right: 6.8mm,
-        margin_top: 6.8mm,
-        margin_bottom: 6.8mm,
-      )
-      let c9 = (page_info.new)(
-        width: 40mm,
-        height: 57mm,
-        margin_left: 4.8mm,
-        margin_right: 4.8mm,
-        margin_top: 4.8mm,
-        margin_bottom: 4.8mm,
-      )
-      let c10 = (page_info.new)(
-        width: 28mm,
-        height: 40mm,
-        margin_left: 3.3mm,
-        margin_right: 3.3mm,
-        margin_top: 3.3mm,
-        margin_bottom: 3.3mm,
-      )
-
-      let letter = (page_info.new)(
-        width: 8.5in,
-        height: 11in,
-        margin_left: 1.01in,
-        margin_right: 1.01in,
-        margin_top: 1.01in,
-        margin_bottom: 1.01in,
-      )
-      let legal = (page_info.new)(
-        width: 8.5in,
-        height: 14in,
-        margin_left: 1.01in,
-        margin_right: 1.01in,
-        margin_top: 1.01in,
-        margin_bottom: 1.01in,
-      )
-      let tabloid = (page_info.new)(
-        width: 11in,
-        height: 17in,
-        margin_left: 1.31in,
-        margin_right: 1.31in,
-        margin_top: 1.31in,
-        margin_bottom: 1.31in,
-      )
-      let ledger = (page_info.new)(
-        width: 17in,
-        height: 11in,
-        margin_left: 1.31in,
-        margin_right: 1.31in,
-        margin_top: 1.31in,
-        margin_bottom: 1.31in,
-      ) // 注意与 tabloid 方向不同
-      let executive = (page_info.new)(
-        width: 7.25in,
-        height: 10.5in,
-        margin_left: 0.86in,
-        margin_right: 0.86in,
-        margin_top: 0.86in,
-        margin_bottom: 0.86in,
-      )
-      let folio = (page_info.new)(
-        width: 8.5in,
-        height: 13in,
-        margin_left: 1.01in,
-        margin_right: 1.01in,
-        margin_top: 1.01in,
-        margin_bottom: 1.01in,
-      )
-      let statement = (page_info.new)(
-        width: 5.5in,
-        height: 8.5in,
-        margin_left: 0.66in,
-        margin_right: 0.66in,
-        margin_top: 0.66in,
-        margin_bottom: 0.66in,
-      )
-      let quarto = (page_info.new)(
-        width: 8.5in,
-        height: 10.83in,
-        margin_left: 1.01in,
-        margin_right: 1.01in,
-        margin_top: 1.01in,
-        margin_bottom: 1.01in,
-      )
-
-      (
-        pages: (
-          a1: a1,
-          a2: a2,
-          a3: a3,
-          a4: a4,
-          a5: a5,
-          a6: a6,
-          a7: a7,
-          a8: a8,
-          a9: a9,
-          a10: a10,
-          b1: b1,
-          b2: b2,
-          b3: b3,
-          b4: b4,
-          b5: b5,
-          b6: b6,
-          b7: b7,
-          b8: b8,
-          b9: b9,
-          b10: b10,
-          c1: c1,
-          c2: c2,
-          c3: c3,
-          c4: c4,
-          c5: c5,
-          c6: c6,
-          c7: c7,
-          c8: c8,
-          c9: c9,
-          c10: c10,
-          letter: letter,
-          legal: legal,
-          tabloid: tabloid,
-          ledger: ledger,
-          executive: executive,
-          folio: folio,
-          statement: statement,
-          quarto: quarto,
-        ),
-      )
-    }
-)
-
-text(
-text: str,
-alternates: bool,
-baseline: length,
+page(
+background: content | none,
+binding: alignment | auto,
 body: content,
-bottom-edge: "baseline" | "bounds" | "descender" | length,
-cjk-latin-spacing: auto | none,
-costs: dictionary,
-dir: dir,
-discretionary-ligatures: bool,
-fallback: bool,
-features: array | dictionary,
+columns: int,
 fill: color,
-font: array | text.font,
-fractions: bool,
-historical-ligatures: bool,
-hyphenate: auto | bool,
-kerning: bool,
-lang: text.lang,
-ligatures: bool,
-number-type: "lining" | "old-style" | auto,
-number-width: "proportional" | "tabular" | auto,
-overhang: bool,
-region: text.region,
-script: auto | str,
-size: text.size,
-slashed-zero: bool,
-spacing: relative,
-stretch: ratio,
-stroke: stroke,
-style: "italic" | "normal" | "oblique",
-stylistic-set: array | int | none,
-top-edge: "ascender" | "baseline" | "bounds" | "cap-height" | "x-height" | length,
-tracking: length,
-weight: "black" | "bold" | "extrabold" | "extralight" | "light" | "medium" | "regular" | "semibold" | "thin" | int
-) -> text
-
-
-#let _text_style = impl(
-  record(
-    font: str,
-    size: length,
-    spacing: length,
-    fill: color,
-    style: str,
-    weight: str,
-    stretch: str,
-    tracking: length,
-    fallback: str,
-  ),
-  display: self => {
-    it => {
-      set text(font: self.font, size: self.size, spacing: self.spacing)
-      it
-    }
-  },
-)
-#let _text_style = (
-  _text_style
-    + (
-      default: (_text_style.new)(
-        font: "Libertinus Serif",
-        size: 11pt,
-        fill: black,
-        style: "normal",
-        weight: "regular",
-        stretch: "normal",
-        tracking: 0pt,
-        fallback: "Deja Vu Sans Mono",
-      ),
-    )
-)
-// TODO:
-#let _text_style = impl(
-  _text_style,
-  render: self => {
-    show text: set text(
-      font: self.font,
-      size: 11pt,
-      fill: black,
-      style: "normal",
-      weight: "regular",
-      stretch: "normal",
-      tracking: 0pt,
-      fallback: "",
-    )
-  },
+flipped: bool,
+footer: auto | content | none,
+footer-descent: relative,
+foreground: content | none,
+header: auto | content | none,
+header-ascent: relative,
+margin: margin,
+number-align: alignment,
+numbering: function | none | str,
+supplement: auto | content | none,
 )
 
-#let _link_style = record(
-  font: str,
-  size: length,
-  fill: color,
-  style: str,
-  weight: str,
-  stretch: str,
-  tracking: length,
-  fallback: str,
-  hyphenate: bool,
-  underline: bool,
-)
-#let _link_style = (
-  _link_style
-    + (
-      default: (_link_style.new)(
-        font: "",
-        size: 11pt,
-        fill: blue,
-        style: "normal",
-        weight: "regular",
-        stretch: "normal",
-        tracking: 0pt,
-        fallback: "",
-        hyphenate: true,
-        underline: true,
-      ),
-    )
-)
+#let page_size = {
+  let page_size = enum(
+    a0: record(),
+    a1: record(),
+    a10: record(),
+    a11: record(),
+    a2: record(),
+    a3: record(),
+    a4: record(),
+    a5: record(),
+    a6: record(),
+    a7: record(),
+    a8: record(),
+    a9: record(),
+    ansi-a: record(),
+    ansi-b: record(),
+    ansi-c: record(),
+    ansi-d: record(),
+    ansi-e: record(),
+    arch-a: record(),
+    arch-b: record(),
+    arch-c: record(),
+    arch-d: record(),
+    arch-e: record(),
+    arch-e1: record(),
+    asia-f4: record(),
+    cn-business-card: record(),
+    din-d3: record(),
+    din-d4: record(),
+    din-d5: record(),
+    din-d6: record(),
+    din-d7: record(),
+    din-d8: record(),
+    eu-business-card: record(),
+    fr-carré: record(),
+    fr-couronne-écriture: record(),
+    fr-couronne-édition: record(),
+    fr-jésus: record(),
+    fr-raisin: record(),
+    fr-tellière: record(),
+    iso-b1: record(),
+    iso-b2: record(),
+    iso-b3: record(),
+    iso-b4: record(),
+    iso-b5: record(),
+    iso-b6: record(),
+    iso-b7: record(),
+    iso-b8: record(),
+    iso-c3: record(),
+    iso-c4: record(),
+    iso-c5: record(),
+    iso-c6: record(),
+    iso-c7: record(),
+    iso-c8: record(),
+    iso-id-1: record(),
+    iso-id-2: record(),
+    iso-id-3: record(),
+    jis-b0: record(),
+    jis-b1: record(),
+    jis-b10: record(),
+    jis-b11: record(),
+    jis-b2: record(),
+    jis-b3: record(),
+    jis-b4: record(),
+    jis-b5: record(),
+    jis-b6: record(),
+    jis-b7: record(),
+    jis-b8: record(),
+    jis-b9: record(),
+    jp-business-card: record(),
+    jp-kiku-4: record(),
+    jp-kiku-5: record(),
+    jp-shiroku-ban-4: record(),
+    jp-shiroku-ban-5: record(),
+    jp-shiroku-ban-6: record(),
+    newspaper-berliner: record(),
+    newspaper-broadsheet: record(),
+    newspaper-compact: record(),
+    presentation-16-9: record(),
+    presentation-4-3: record(),
+    sac-d0: record(),
+    sac-d1: record(),
+    sac-d2: record(),
+    sac-d3: record(),
+    sac-d4: record(),
+    sac-d5: record(),
+    sac-d6: record(),
+    sis-e5: record(),
+    sis-g5: record(),
+    uk-book-a: record(),
+    uk-book-b: record(),
+    uk-brief: record(),
+    uk-crown: record(),
+    uk-draft: record(),
+    uk-foolscap: record(),
+    uk-quarto: record(),
+    us-business-card: record(),
+    us-digest: record(),
+    us-executive: record(),
+    us-foolscap-folio: record(),
+    us-gov-legal: record(),
+    us-gov-letter: record(),
+    us-ledger: record(),
+    us-legal: record(),
+    us-letter: record(),
+    us-oficio: record(),
+    us-statement: record(),
+    us-tabloid: record(),
+    us-trade: record(),
+    custom: record(
+      width: length,
+      height: length,
+    ),
+  )
 
-// Heading style record
-#let _heading_style = record(
-  font: str,
-  size: length,
-  fill: color,
-  style: str,
-  weight: str,
-  stretch: str,
-  tracking: length,
-  fallback: str,
-  numbering: str,
-  supplement: str,
-  outlined: bool,
-  render: function,
-)
-#let _heading_style = (
-  _heading_style
-    + (
-      default: (
-        "1": (_heading_style.new)(
-          font: "",
-          size: 24pt,
-          fill: black,
-          style: "normal",
-          weight: "bold",
-          stretch: "normal",
-          tracking: 0pt,
-          fallback: "",
-          numbering: "1.",
-          supplement: "Chapter",
-          outlined: true,
-          render: doc => [= #doc.title],
-        ),
-        "2": (_heading_style.new)(
-          font: "",
-          size: 18pt,
-          fill: black,
-          style: "normal",
-          weight: "bold",
-          stretch: "normal",
-          tracking: 0pt,
-          fallback: "",
-          numbering: "1.1",
-          supplement: "Section",
-          outlined: true,
-          render: doc => [== #doc.title],
-        ),
-        "3": (_heading_style.new)(
-          font: "",
-          size: 14pt,
-          fill: black,
-          style: "normal",
-          weight: "bold",
-          stretch: "normal",
-          tracking: 0pt,
-          fallback: "",
-          numbering: "1.1.1",
-          supplement: "Subsection",
-          outlined: true,
-          render: doc => [=== #doc.title],
-        ),
-      ),
-    )
-)
+  page_size = impl_enum(
+    page_size,
+    display: self => {
+      it => {
+        if "custom" == self.variant {
+          show page: set page(width: self.payload.width, height: self.payload.height)
+        } else {
+          show page: set page(paper: self.variant)
+        }
+      }
+    },
+  )
 
-#let _footnote_numbering_style = enum(
-  continuous: (),
-  paged: (),
-)
-#let _footnote_style = record(
-  numbering: _footnote_numbering_style,
-  style: str,
-)
-#let _footnote_style = (
-  _footnote_style
-    + (
-      default: (_footnote_style.new)(
-        numbering: (_footnote_numbering_style.continuous)(),
-        style: "",
-      ),
-    )
-)
+  page_size = (
+    page_size
+      + (
+        a0: (page_size.a0)(),
+        a1: (page_size.a1)(),
+        a10: (page_size.a10)(),
+        a11: (page_size.a11)(),
+        a2: (page_size.a2)(),
+        a3: (page_size.a3)(),
+        a4: (page_size.a4)(),
+        a5: (page_size.a5)(),
+        a6: (page_size.a6)(),
+        a7: (page_size.a7)(),
+        a8: (page_size.a8)(),
+        a9: (page_size.a9)(),
+        ansi-a: (page_size.ansi-a)(),
+        ansi-b: (page_size.ansi-b)(),
+        ansi-c: (page_size.ansi-c)(),
+        ansi-d: (page_size.ansi-d)(),
+        ansi-e: (page_size.ansi-e)(),
+        arch-a: (page_size.arch-a)(),
+        arch-b: (page_size.arch-b)(),
+        arch-c: (page_size.arch-c)(),
+        arch-d: (page_size.arch-d)(),
+        arch-e: (page_size.arch-e)(),
+        arch-e1: (page_size.arch-e1)(),
+        asia-f4: (page_size.asia-f4)(),
+        cn-business-card: (page_size.cn-business-card)(),
+        din-d3: (page_size.din-d3)(),
+        din-d4: (page_size.din-d4)(),
+        din-d5: (page_size.din-d5)(),
+        din-d6: (page_size.din-d6)(),
+        din-d7: (page_size.din-d7)(),
+        din-d8: (page_size.din-d8)(),
+        eu-business-card: (page_size.eu-business-card)(),
+        fr-carré: (page_size.fr-carré)(),
+        fr-couronne-écriture: (page_size.fr-couronne-écriture)(),
+        fr-couronne-édition: (page_size.fr-couronne-édition)(),
+        fr-jésus: (page_size.fr-jésus)(),
+        fr-raisin: (page_size.fr-raisin)(),
+        fr-tellière: (page_size.fr-tellière)(),
+        iso-b1: (page_size.iso-b1)(),
+        iso-b2: (page_size.iso-b2)(),
+        iso-b3: (page_size.iso-b3)(),
+        iso-b4: (page_size.iso-b4)(),
+        iso-b5: (page_size.iso-b5)(),
+        iso-b6: (page_size.iso-b6)(),
+        iso-b7: (page_size.iso-b7)(),
+        iso-b8: (page_size.iso-b8)(),
+        iso-c3: (page_size.iso-c3)(),
+        iso-c4: (page_size.iso-c4)(),
+        iso-c5: (page_size.iso-c5)(),
+        iso-c6: (page_size.iso-c6)(),
+        iso-c7: (page_size.iso-c7)(),
+        iso-c8: (page_size.iso-c8)(),
+        iso-id-1: (page_size.iso-id-1)(),
+        iso-id-2: (page_size.iso-id-2)(),
+        iso-id-3: (page_size.iso-id-3)(),
+        jis-b0: (page_size.jis-b0)(),
+        jis-b1: (page_size.jis-b1)(),
+        jis-b10: (page_size.jis-b10)(),
+        jis-b11: (page_size.jis-b11)(),
+        jis-b2: (page_size.jis-b2)(),
+        jis-b3: (page_size.jis-b3)(),
+        jis-b4: (page_size.jis-b4)(),
+        jis-b5: (page_size.jis-b5)(),
+        jis-b6: (page_size.jis-b6)(),
+        jis-b7: (page_size.jis-b7)(),
+        jis-b8: (page_size.jis-b8)(),
+        jis-b9: (page_size.jis-b9)(),
+        jp-business-card: (page_size.jp-business-card)(),
+        jp-kiku-4: (page_size.jp-kiku-4)(),
+        jp-kiku-5: (page_size.jp-kiku-5)(),
+        jp-shiroku-ban-4: (page_size.jp-shiroku-ban-4)(),
+        jp-shiroku-ban-5: (page_size.jp-shiroku-ban-5)(),
+        jp-shiroku-ban-6: (page_size.jp-shiroku-ban-6)(),
+        newspaper-berliner: (page_size.newspaper-berliner)(),
+        newspaper-broadsheet: (page_size.newspaper-broadsheet)(),
+        newspaper-compact: (page_size.newspaper-compact)(),
+        presentation-16-9: (page_size.presentation-16-9)(),
+        presentation-4-3: (page_size.presentation-4-3)(),
+        sac-d0: (page_size.sac-d0)(),
+        sac-d1: (page_size.sac-d1)(),
+        sac-d2: (page_size.sac-d2)(),
+        sac-d3: (page_size.sac-d3)(),
+        sac-d4: (page_size.sac-d4)(),
+        sac-d5: (page_size.sac-d5)(),
+        sac-d6: (page_size.sac-d6)(),
+        sis-e5: (page_size.sis-e5)(),
+        sis-g5: (page_size.sis-g5)(),
+        uk-book-a: (page_size.uk-book-a)(),
+        uk-book-b: (page_size.uk-book-b)(),
+        uk-brief: (page_size.uk-brief)(),
+        uk-crown: (page_size.uk-crown)(),
+        uk-draft: (page_size.uk-draft)(),
+        uk-foolscap: (page_size.uk-foolscap)(),
+        uk-quarto: (page_size.uk-quarto)(),
+        us-business-card: (page_size.us-business-card)(),
+        us-digest: (page_size.us-digest)(),
+        us-executive: (page_size.us-executive)(),
+        us-foolscap-folio: (page_size.us-foolscap-folio)(),
+        us-gov-legal: (page_size.us-gov-legal)(),
+        us-gov-letter: (page_size.us-gov-letter)(),
+        us-ledger: (page_size.us-ledger)(),
+        us-legal: (page_size.us-legal)(),
+        us-letter: (page_size.us-letter)(),
+        us-oficio: (page_size.us-oficio)(),
+        us-statement: (page_size.us-statement)(),
+        us-tabloid: (page_size.us-tabloid)(),
+        us-trade: (page_size.us-trade)(),
+        cn-is-degree-full: (page_size.custom)(width: 787mm, height: 1092mm),
+        cn-magnanimous-full: (page_size.custom)(width: 889mm, height: 1194mm),
+      )
+  )
 
-// Style global record - defines book-wide styles
-#let _style_global = record(
-  text: _text_style,
-  heading: dictionary,
-  title: _text_style,
-  abstract: _text_style,
-  keyword: _text_style,
-  link: _link_style,
-  header: content,
-  footer: content,
-  footnote: _footnote_style,
-  page: page_info,
-  flipped: bool,
-  bleed: length,
-  standalone_doc: bool,
-  verso_blank: bool,
-  the_book: _core_doc,
-  flyleaf: content,
-  half_title_page: content,
-  dedication: content,
-  rear_endpaper: content,
-)
-
+  page_size
+}

@@ -8,7 +8,8 @@
 // by a future bibliography/record layer).
 
 #import "uid.typ": namespaces, v3
-#import "record.typ": enum, record
+#import "record.typ": record
+#import "enum.typ": enum
 #import "categories.typ": category
 #import "tag.typ": tag
 #import "state.typ": _mkstate, _state
@@ -41,8 +42,8 @@
 )
 
 #let image = enum(
-  path: (p: str),
-  null: (),
+  path: record(p: str),
+  null: record(),
 )
 #let image = image + (null: (image.null)())
 
@@ -93,6 +94,7 @@
   license: "apache-v2",
   //
   description: "",
+  cover_image: image.null,
   category: category.null,
   tags: (),
   tlb: (:),
@@ -114,6 +116,7 @@
     license: license,
 
     description: description,
+    cover_image: cover_image,
 
     category: category,
 

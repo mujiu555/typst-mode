@@ -3,7 +3,7 @@
 // plus one child per given name, and `sub` grows further children. Each tag
 // tracks the documents attached to it via its own `_state` slot.
 
-#import "record.typ": _fetch_method, impl, record
+#import "record.typ": _fetch_method, impl_record, record
 #import "state.typ": _mkstate, _state
 
 #import "uid.typ": namespaces, v3
@@ -22,7 +22,7 @@
   documents: _state,
 )
 
-#let tag = impl(
+#let tag = impl_record(
   tag,
   // Create a child tag under this one. The child gets a fresh, empty
   // `documents` slot so it tracks its own documents. `self._type.new` (rather
@@ -34,7 +34,7 @@
       _parent: self.id,
       id: _tag_uuid(name),
       name: name,
-      documents: mk("a61f608d-7f35-4ff9-a9a6-65ba40dffc2f", (:)),
+      documents: _mkstate("a61f608d-7f35-4ff9-a9a6-65ba40dffc2f", (:)),
     )
   },
   // Attach a document to this tag. `documents` is a dictionary keyed by

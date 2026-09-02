@@ -1,4 +1,4 @@
-#import "record.typ": impl, record
+#import "record.typ": impl_record, record
 #import "uid.typ": namespaces, v3
 
 // Just prevent user from using names used in this library is ok....
@@ -15,7 +15,7 @@
 
   let _s = state(sym, init)
 
-  let s_state = impl(
+  let s_state = impl_record(
     _state,
     get: self => {
       _s.get()
