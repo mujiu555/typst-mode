@@ -39,8 +39,8 @@
     block(above: 0.8em, text(weight: 600, fill: _taxon-color, upper(taxon.at(0)) + taxon.slice(1) + "."))
   }
   // Register outside the heading body: outlines replay that body.
-  mkindex(doc.id, heading(depth: 1, block(
-    below: 0.3em,
+  mkindex(doc.id, block(below: 0.3em, heading(
+    depth: 1,
     text(weight: 600, doc.title) + h(0.5em) + _slug("[" + doc.id + "]"),
   )))
   let parts = _details(doc)
@@ -76,7 +76,7 @@
   heading(outlined: false, title)
   for (name, entry) in indexers() {
     block[
-      #link(entry.loc, entry.content) #_slug("[" + name + "]")
+      #link(entry.loc, entry.content)
       #if show-backlinks {
         let refs = backlinks(name)
         if refs.len() > 0 {
