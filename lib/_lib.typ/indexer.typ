@@ -5,7 +5,7 @@
 
 #import "uid.typ": namespaces, v3
 
-#import "record.typ": impl, record
+#import "record.typ": impl_record, record
 #import "state.typ": _mkstate, _state
 
 // Global store of labels: name -> index entry. A fresh `_state` slot is
@@ -19,7 +19,7 @@
   (:),
 )
 
-// UUID namespace for index labels, mirroring meta.typ / tag.typ.
+// UUID namespace for index labels, mirroring doc.typ / tag.typ.
 #let _ns_index = v3(namespaces.oid, "5eb885ab-9e08-43ba-bb95-8e6178761d88")
 #let _index_uuid(name) = v3(_ns_index, name)
 
@@ -36,7 +36,7 @@
   content: content,
 )
 
-#let _indexer = impl(
+#let _indexer = impl_record(
   _indexer,
   // Build a link to the recorded location, shown as `content`.
   lookup: (self, loc, content) => context {

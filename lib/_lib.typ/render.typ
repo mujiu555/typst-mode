@@ -1,4 +1,4 @@
-#import "meta.typ": meta
+#import "doc.typ": meta
 #import "style.typ": style
 #import "indexer.typ": backlinks, indexers
 

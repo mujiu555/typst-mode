@@ -1,6 +1,8 @@
+#import "types.typ": image
+#import "record.typ": record
+#import "enum.typ": enum
 #import "record.typ": impl_record, record
 #import "enum.typ": enum, impl_enum
-#import "meta.typ": _core_doc
 #import "uid.typ": namespaces, v3
 #import "state.typ": _mkstate
 
@@ -12,26 +14,8 @@
   (:),
 )
 
-page(
-background: content | none,
-binding: alignment | auto,
-body: content,
-columns: int,
-fill: color,
-flipped: bool,
-footer: auto | content | none,
-footer-descent: relative,
-foreground: content | none,
-header: auto | content | none,
-header-ascent: relative,
-margin: margin,
-number-align: alignment,
-numbering: function | none | str,
-supplement: auto | content | none,
-)
-
-#let page_size = {
-  let page_size = enum(
+#let _page_size = {
+  let _page_size = enum(
     a0: record(),
     a1: record(),
     a10: record(),
@@ -145,133 +129,323 @@ supplement: auto | content | none,
     ),
   )
 
-  page_size = impl_enum(
-    page_size,
+  _page_size = impl_enum(
+    _page_size,
     display: self => {
       it => {
         if "custom" == self.variant {
-          show page: set page(width: self.payload.width, height: self.payload.height)
+          set page(width: self.payload.width, height: self.payload.height)
         } else {
-          show page: set page(paper: self.variant)
+          set page(paper: self.variant)
         }
       }
     },
   )
 
-  page_size = (
-    page_size
+  _page_size = (
+    _page_size
       + (
-        a0: (page_size.a0)(),
-        a1: (page_size.a1)(),
-        a10: (page_size.a10)(),
-        a11: (page_size.a11)(),
-        a2: (page_size.a2)(),
-        a3: (page_size.a3)(),
-        a4: (page_size.a4)(),
-        a5: (page_size.a5)(),
-        a6: (page_size.a6)(),
-        a7: (page_size.a7)(),
-        a8: (page_size.a8)(),
-        a9: (page_size.a9)(),
-        ansi-a: (page_size.ansi-a)(),
-        ansi-b: (page_size.ansi-b)(),
-        ansi-c: (page_size.ansi-c)(),
-        ansi-d: (page_size.ansi-d)(),
-        ansi-e: (page_size.ansi-e)(),
-        arch-a: (page_size.arch-a)(),
-        arch-b: (page_size.arch-b)(),
-        arch-c: (page_size.arch-c)(),
-        arch-d: (page_size.arch-d)(),
-        arch-e: (page_size.arch-e)(),
-        arch-e1: (page_size.arch-e1)(),
-        asia-f4: (page_size.asia-f4)(),
-        cn-business-card: (page_size.cn-business-card)(),
-        din-d3: (page_size.din-d3)(),
-        din-d4: (page_size.din-d4)(),
-        din-d5: (page_size.din-d5)(),
-        din-d6: (page_size.din-d6)(),
-        din-d7: (page_size.din-d7)(),
-        din-d8: (page_size.din-d8)(),
-        eu-business-card: (page_size.eu-business-card)(),
-        fr-carré: (page_size.fr-carré)(),
-        fr-couronne-écriture: (page_size.fr-couronne-écriture)(),
-        fr-couronne-édition: (page_size.fr-couronne-édition)(),
-        fr-jésus: (page_size.fr-jésus)(),
-        fr-raisin: (page_size.fr-raisin)(),
-        fr-tellière: (page_size.fr-tellière)(),
-        iso-b1: (page_size.iso-b1)(),
-        iso-b2: (page_size.iso-b2)(),
-        iso-b3: (page_size.iso-b3)(),
-        iso-b4: (page_size.iso-b4)(),
-        iso-b5: (page_size.iso-b5)(),
-        iso-b6: (page_size.iso-b6)(),
-        iso-b7: (page_size.iso-b7)(),
-        iso-b8: (page_size.iso-b8)(),
-        iso-c3: (page_size.iso-c3)(),
-        iso-c4: (page_size.iso-c4)(),
-        iso-c5: (page_size.iso-c5)(),
-        iso-c6: (page_size.iso-c6)(),
-        iso-c7: (page_size.iso-c7)(),
-        iso-c8: (page_size.iso-c8)(),
-        iso-id-1: (page_size.iso-id-1)(),
-        iso-id-2: (page_size.iso-id-2)(),
-        iso-id-3: (page_size.iso-id-3)(),
-        jis-b0: (page_size.jis-b0)(),
-        jis-b1: (page_size.jis-b1)(),
-        jis-b10: (page_size.jis-b10)(),
-        jis-b11: (page_size.jis-b11)(),
-        jis-b2: (page_size.jis-b2)(),
-        jis-b3: (page_size.jis-b3)(),
-        jis-b4: (page_size.jis-b4)(),
-        jis-b5: (page_size.jis-b5)(),
-        jis-b6: (page_size.jis-b6)(),
-        jis-b7: (page_size.jis-b7)(),
-        jis-b8: (page_size.jis-b8)(),
-        jis-b9: (page_size.jis-b9)(),
-        jp-business-card: (page_size.jp-business-card)(),
-        jp-kiku-4: (page_size.jp-kiku-4)(),
-        jp-kiku-5: (page_size.jp-kiku-5)(),
-        jp-shiroku-ban-4: (page_size.jp-shiroku-ban-4)(),
-        jp-shiroku-ban-5: (page_size.jp-shiroku-ban-5)(),
-        jp-shiroku-ban-6: (page_size.jp-shiroku-ban-6)(),
-        newspaper-berliner: (page_size.newspaper-berliner)(),
-        newspaper-broadsheet: (page_size.newspaper-broadsheet)(),
-        newspaper-compact: (page_size.newspaper-compact)(),
-        presentation-16-9: (page_size.presentation-16-9)(),
-        presentation-4-3: (page_size.presentation-4-3)(),
-        sac-d0: (page_size.sac-d0)(),
-        sac-d1: (page_size.sac-d1)(),
-        sac-d2: (page_size.sac-d2)(),
-        sac-d3: (page_size.sac-d3)(),
-        sac-d4: (page_size.sac-d4)(),
-        sac-d5: (page_size.sac-d5)(),
-        sac-d6: (page_size.sac-d6)(),
-        sis-e5: (page_size.sis-e5)(),
-        sis-g5: (page_size.sis-g5)(),
-        uk-book-a: (page_size.uk-book-a)(),
-        uk-book-b: (page_size.uk-book-b)(),
-        uk-brief: (page_size.uk-brief)(),
-        uk-crown: (page_size.uk-crown)(),
-        uk-draft: (page_size.uk-draft)(),
-        uk-foolscap: (page_size.uk-foolscap)(),
-        uk-quarto: (page_size.uk-quarto)(),
-        us-business-card: (page_size.us-business-card)(),
-        us-digest: (page_size.us-digest)(),
-        us-executive: (page_size.us-executive)(),
-        us-foolscap-folio: (page_size.us-foolscap-folio)(),
-        us-gov-legal: (page_size.us-gov-legal)(),
-        us-gov-letter: (page_size.us-gov-letter)(),
-        us-ledger: (page_size.us-ledger)(),
-        us-legal: (page_size.us-legal)(),
-        us-letter: (page_size.us-letter)(),
-        us-oficio: (page_size.us-oficio)(),
-        us-statement: (page_size.us-statement)(),
-        us-tabloid: (page_size.us-tabloid)(),
-        us-trade: (page_size.us-trade)(),
-        cn-is-degree-full: (page_size.custom)(width: 787mm, height: 1092mm),
-        cn-magnanimous-full: (page_size.custom)(width: 889mm, height: 1194mm),
+        a0: (_page_size.a0)(),
+        a1: (_page_size.a1)(),
+        a10: (_page_size.a10)(),
+        a11: (_page_size.a11)(),
+        a2: (_page_size.a2)(),
+        a3: (_page_size.a3)(),
+        a4: (_page_size.a4)(),
+        a5: (_page_size.a5)(),
+        a6: (_page_size.a6)(),
+        a7: (_page_size.a7)(),
+        a8: (_page_size.a8)(),
+        a9: (_page_size.a9)(),
+        ansi-a: (_page_size.ansi-a)(),
+        ansi-b: (_page_size.ansi-b)(),
+        ansi-c: (_page_size.ansi-c)(),
+        ansi-d: (_page_size.ansi-d)(),
+        ansi-e: (_page_size.ansi-e)(),
+        arch-a: (_page_size.arch-a)(),
+        arch-b: (_page_size.arch-b)(),
+        arch-c: (_page_size.arch-c)(),
+        arch-d: (_page_size.arch-d)(),
+        arch-e: (_page_size.arch-e)(),
+        arch-e1: (_page_size.arch-e1)(),
+        asia-f4: (_page_size.asia-f4)(),
+        cn-business-card: (_page_size.cn-business-card)(),
+        din-d3: (_page_size.din-d3)(),
+        din-d4: (_page_size.din-d4)(),
+        din-d5: (_page_size.din-d5)(),
+        din-d6: (_page_size.din-d6)(),
+        din-d7: (_page_size.din-d7)(),
+        din-d8: (_page_size.din-d8)(),
+        eu-business-card: (_page_size.eu-business-card)(),
+        fr-carré: (_page_size.fr-carré)(),
+        fr-couronne-écriture: (_page_size.fr-couronne-écriture)(),
+        fr-couronne-édition: (_page_size.fr-couronne-édition)(),
+        fr-jésus: (_page_size.fr-jésus)(),
+        fr-raisin: (_page_size.fr-raisin)(),
+        fr-tellière: (_page_size.fr-tellière)(),
+        iso-b1: (_page_size.iso-b1)(),
+        iso-b2: (_page_size.iso-b2)(),
+        iso-b3: (_page_size.iso-b3)(),
+        iso-b4: (_page_size.iso-b4)(),
+        iso-b5: (_page_size.iso-b5)(),
+        iso-b6: (_page_size.iso-b6)(),
+        iso-b7: (_page_size.iso-b7)(),
+        iso-b8: (_page_size.iso-b8)(),
+        iso-c3: (_page_size.iso-c3)(),
+        iso-c4: (_page_size.iso-c4)(),
+        iso-c5: (_page_size.iso-c5)(),
+        iso-c6: (_page_size.iso-c6)(),
+        iso-c7: (_page_size.iso-c7)(),
+        iso-c8: (_page_size.iso-c8)(),
+        iso-id-1: (_page_size.iso-id-1)(),
+        iso-id-2: (_page_size.iso-id-2)(),
+        iso-id-3: (_page_size.iso-id-3)(),
+        jis-b0: (_page_size.jis-b0)(),
+        jis-b1: (_page_size.jis-b1)(),
+        jis-b10: (_page_size.jis-b10)(),
+        jis-b11: (_page_size.jis-b11)(),
+        jis-b2: (_page_size.jis-b2)(),
+        jis-b3: (_page_size.jis-b3)(),
+        jis-b4: (_page_size.jis-b4)(),
+        jis-b5: (_page_size.jis-b5)(),
+        jis-b6: (_page_size.jis-b6)(),
+        jis-b7: (_page_size.jis-b7)(),
+        jis-b8: (_page_size.jis-b8)(),
+        jis-b9: (_page_size.jis-b9)(),
+        jp-business-card: (_page_size.jp-business-card)(),
+        jp-kiku-4: (_page_size.jp-kiku-4)(),
+        jp-kiku-5: (_page_size.jp-kiku-5)(),
+        jp-shiroku-ban-4: (_page_size.jp-shiroku-ban-4)(),
+        jp-shiroku-ban-5: (_page_size.jp-shiroku-ban-5)(),
+        jp-shiroku-ban-6: (_page_size.jp-shiroku-ban-6)(),
+        newspaper-berliner: (_page_size.newspaper-berliner)(),
+        newspaper-broadsheet: (_page_size.newspaper-broadsheet)(),
+        newspaper-compact: (_page_size.newspaper-compact)(),
+        presentation-16-9: (_page_size.presentation-16-9)(),
+        presentation-4-3: (_page_size.presentation-4-3)(),
+        sac-d0: (_page_size.sac-d0)(),
+        sac-d1: (_page_size.sac-d1)(),
+        sac-d2: (_page_size.sac-d2)(),
+        sac-d3: (_page_size.sac-d3)(),
+        sac-d4: (_page_size.sac-d4)(),
+        sac-d5: (_page_size.sac-d5)(),
+        sac-d6: (_page_size.sac-d6)(),
+        sis-e5: (_page_size.sis-e5)(),
+        sis-g5: (_page_size.sis-g5)(),
+        uk-book-a: (_page_size.uk-book-a)(),
+        uk-book-b: (_page_size.uk-book-b)(),
+        uk-brief: (_page_size.uk-brief)(),
+        uk-crown: (_page_size.uk-crown)(),
+        uk-draft: (_page_size.uk-draft)(),
+        uk-foolscap: (_page_size.uk-foolscap)(),
+        uk-quarto: (_page_size.uk-quarto)(),
+        us-business-card: (_page_size.us-business-card)(),
+        us-digest: (_page_size.us-digest)(),
+        us-executive: (_page_size.us-executive)(),
+        us-foolscap-folio: (_page_size.us-foolscap-folio)(),
+        us-gov-legal: (_page_size.us-gov-legal)(),
+        us-gov-letter: (_page_size.us-gov-letter)(),
+        us-ledger: (_page_size.us-ledger)(),
+        us-legal: (_page_size.us-legal)(),
+        us-letter: (_page_size.us-letter)(),
+        us-oficio: (_page_size.us-oficio)(),
+        us-statement: (_page_size.us-statement)(),
+        us-tabloid: (_page_size.us-tabloid)(),
+        us-trade: (_page_size.us-trade)(),
+        cn-is-degree-full: (_page_size.custom)(width: 787mm, height: 1092mm),
+        cn-magnanimous-full: (_page_size.custom)(width: 889mm, height: 1194mm),
       )
   )
 
-  page_size
+  _page_size
 }
+
+#let _margin_info = record(
+  top: length,
+  bottom: length,
+  left: length,
+  right: length,
+)
+
+#let _margin_info = impl_record(
+  _margin_info,
+  display: self => {
+    it => {
+      set page(margin: (
+        top: self.top,
+        bottom: self.bottom,
+        left: self.left,
+        right: self.right,
+      ))
+    }
+  },
+)
+
+#let _margin_info = (
+  _margin_info
+    + (
+      margin: len => (_margin_info.new)(top: len, bottom: len, left: len, right: len),
+      xy: (x, y) => (_margin_info.new)(top: y, bottom: y, left: x, right: x),
+    )
+)
+
+#let _numbering_style = enum(
+  num: record(
+    prefix: str,
+    fmt: str,
+    suffix: str,
+  ),
+  num_both: record(
+    prefix: str,
+    fmt: str,
+    suffix: str,
+    mid: str,
+    final_fmt: str,
+  ),
+  fun: function,
+  null: record(),
+)
+
+#let _numbering_style = impl_enum(
+  _numbering_style,
+  display: self => {
+    it => {
+      if (self.variant == "num") {
+        set page(numbering: self.payload.prefix + self.payload.fmt + self.payload.suffix)
+      } else if (self.variant == "num_both") {
+        set page(
+          numbering: self.payload.prefix
+            + self.payload.fmt
+            + self.payload.mid
+            + self.payload.final_fmt
+            + self.payload.suffix,
+        )
+      } else if (null == self.variant) {} else {
+        set page(numbering: self.payload)
+      }
+      it
+    }
+  },
+  render: self => context {
+    if (self.variant == "num_both") {
+      let p = self.payload
+      counter(page).display(
+        p.prefix + p.fmt + p.mid + p.final_fmt + p.suffix,
+        both: true,
+      )
+    } else if (self.variant == "num") {
+      counter(page).display()
+    } else if (null == self.variant) {
+      none
+    } else {
+      counter(page).display()
+    }
+  },
+)
+
+#let _numbering_style = (
+  _numbering_style
+    + (
+      num: (_numbering_style.num).with(fmt: "1"),
+      alpha: (_numbering_style.num).with(fmt: "a"),
+      alpha_c: (_numbering_style.num).with(fmt: "A"),
+      roman: (_numbering_style.num).with(fmt: "i"),
+      roman_c: (_numbering_style.num).with(fmt: "I"),
+      greek: (_numbering_style.num).with(fmt: "α"),
+      greek_c: (_numbering_style.num).with(fmt: "Α"),
+      cn: (_numbering_style.num).with(fmt: "一"),
+      cn_c: (_numbering_style.num).with(fmt: "壹"),
+      hiragana: (_numbering_style.num).with(fmt: "あ"),
+      hiragana_ii: (_numbering_style.num).with(fmt: "い"),
+      katakana: (_numbering_style.num).with(fmt: "ア"),
+      katakana_ii: (_numbering_style.num).with(fmt: "イ"),
+      hebrew: (_numbering_style.num).with(fmt: "א"),
+      korean: (_numbering_style.num).with(fmt: "가"),
+      korean_ii: (_numbering_style.num).with(fmt: "ㄱ"),
+      symbol: (_numbering_style.num).with(fmt: "*"),
+      arabic_indic: (_numbering_style.num).with(fmt: "١"),
+      persian: (_numbering_style.num).with(fmt: "۱"),
+      devanagari: (_numbering_style.num).with(fmt: "१"),
+      bengali: (_numbering_style.num).with(fmt: "১"),
+      bengali_alpha: (_numbering_style.num).with(fmt: "ক"),
+      circled: (_numbering_style.num).with(fmt: "①"),
+      circled_double: (_numbering_style.num).with(fmt: "⓵"),
+      num_over_num: (_numbering_style.num_both).with(
+        fmt: "1",
+        mid: "/",
+        final_fmt: "1",
+      ),
+    )
+)
+
+#let _page_info = record(
+  size: _page_size,
+  flipped: bool,
+  margin: _margin_info,
+
+  footer-descent: relative,
+  header-ascent: relative,
+
+  fill: color,
+  background: image,
+  foreground: image,
+
+  footer: function,
+  header: function,
+
+  numbering: _numbering_style,
+
+  supplement: str,
+)
+
+#let _page_info = impl_record(
+  _page_info,
+  display: self => {
+    it => {
+      let it = (self.margin.display)((self.size.display)(it))
+      if self.background.variant == "path" {
+        set page(background: self.background.payload)
+      }
+      if self.foreground.variant == "path" {
+        set page(foreground: self.foreground.payload)
+      }
+      set page(flipped: self.flipped, header-ascent: self.header-ascent, footer-descent: self.footer-descent)
+      it
+    }
+  },
+)
+
+text(
+alternates: bool
+baseline: length
+bottom-edge: "baseline" | "bounds" | "descender" | length
+cjk-latin-spacing: auto | none
+costs: dictionary
+dir: dir
+discretionary-ligatures: bool
+fallback: bool
+features: array | dictionary
+fill: color
+font: array | text.font
+fractions: bool
+historical-ligatures: bool
+hyphenate: auto | bool
+kerning: bool
+lang: text.lang
+ligatures: bool
+number-type: "lining" | "old-style" | auto
+number-width: "proportional" | "tabular" | auto
+overhang: bool
+region: text.region
+script: auto | str
+size: text.size
+slashed-zero: bool
+spacing: relative
+stretch: ratio
+stroke: stroke
+style: "italic" | "normal" | "oblique"
+stylistic-set: array | int | none
+top-edge: "ascender" | "baseline" | "bounds" | "cap-height" | "x-height" | length
+tracking: length
+weight: "black" | "bold" | "extrabold" | "extralight" | "light" | "medium" | "regular" | "semibold" | "thin" | int
+) -> text

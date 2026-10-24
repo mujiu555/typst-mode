@@ -4,7 +4,7 @@
 // plus a `payload` holding that variant's fields. For example a journal
 // article is `category.journal(journal: ..., volume: ..., ...)`.
 
-#import "record.typ": impl_record, record
+#import "record.typ": record
 #import "enum.typ": enum
 
 // Tagged union: `variant` selects the publication type, `content` carries
@@ -51,5 +51,5 @@
 
 // Re-bind `category.null` from the null-variant *constructor* to a
 // ready-made null *instance*, so `category.null` can be used directly as
-// the default "no category" value (see `meta`'s default in meta.typ).
+// the default "no category" value (see `meta`'s default in doc.typ).
 #let category = category + (null: (category.null)())

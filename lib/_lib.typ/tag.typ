@@ -3,12 +3,13 @@
 // plus one child per given name, and `sub` grows further children. Each tag
 // tracks the documents attached to it via its own `_state` slot.
 
-#import "record.typ": _fetch_method, impl_record, record
+#import "record.typ": impl_record, record
+#import "util.typ": _fetch_method
 #import "state.typ": _mkstate, _state
 
 #import "uid.typ": namespaces, v3
 
-// UUID namespace for tags, mirroring the scheme used in meta.typ.
+// UUID namespace for tags, mirroring the scheme used in doc.typ.
 #let _ns_tag = v3(namespaces.oid, "ac562613-54f4-4584-8ea4-1401df8d1ed2")
 #let _tag_uuid(name) = v3(_ns_tag, name)
 

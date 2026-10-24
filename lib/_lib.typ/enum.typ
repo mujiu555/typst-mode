@@ -1,46 +1,41 @@
 #import "uid.typ": namespaces, v3
+#import "util.typ": _fetch_method
 
 #let _ns_enum = v3(namespaces.oid, "e4f747b7-fc19-4082-9acf-cd0f1b188bba")
 #let _enum_uuid(name) = v3(_ns_enum, name)
 
-// Structural type match: `t` is the expected type, `v` the actual value.
-// Raw types (`int`, `str`, ...) match against `type(v)`; record types match
-// against the type stored in a value's `_type`.
-#let _match(t, v) = {
-  let tv = type(v)
-  if t == none {
-    // `none` means "unconstrained" — any value passes
-    true
-  } else if type(t) == type {
-    // a raw type such as `int` or `str`: compare directly
-    t == tv
-  } else if tv == dictionary and dictionary.keys(v).contains("_type") {
-    // `v` is a record instance: compare its `_type` against the expected one
-    let tv = v.at("_type", default: auto)
-    (t.compare)(tv)
+// The `fields` method: return a dictionary of field-name -> value for a
+// record instance.
+#let _get_fields_enum(self) = {
+  let out = (:)
+  let typ = self._type._variants.at(self.variant)
+  if (type(typ) == type) {
+    self.payload
   } else {
-    // `t` is a record type but `v` is not a record → cannot match
-    false
+    for (n, t) in typ._fields {
+      out.insert(n, self.payload.at(n))
+    }
+    out
   }
 }
 
-// Structural type comparison: every field of `self` must exist in `other`
-// with a matching type. Extra fields on `other` are allowed (asymmetric /
-// structural-subtype behaviour).
-#let _compare(self, other) = {
+// Structural type comparison for enums: every variant of `self` must exist
+// in `other` with a matching type. Extra variants on `other` are allowed
+// (asymmetric / structural-subtype behaviour), mirroring record compare.
+#let _enum_compare(self, other) = {
   assert(
     type(other) != type,
-    message: "value `" + repr(other) + "` is not a record, can only compare between records",
+    message: "value `" + repr(other) + "` is not an enum, can only compare between enums",
   )
-  // Same `_type_id` → identical declaration, no need to compare fields
+  // Same `_type_id` → identical declaration, no need to compare variants
   if self._type_id == other._type_id {
     return true
   }
   let same = true
-  for (name, t) in self._fields {
-    let ot = other._fields.at(name, default: auto)
+  for (name, t) in self._variants {
+    let ot = other._variants.at(name, default: auto)
     if (ot == auto) {
-      // `other` is missing this field → not a subtype
+      // `other` is missing this variant → not a subtype
       same = false
       break
     }
@@ -57,29 +52,6 @@
     }
   }
   same
-}
-
-// Bind a batch of methods into a copy of `self`.
-// `fn(name)` must return a function of shape `(self, ..rest) => ...`; the
-// result maps every method name to `fn(name)`. Callers pass `fn` as the
-// `this_call` closure, which is what keeps `self` pointing at the current
-// (possibly extended) type or instance.
-#let _fetch_method(self, fn, methods) = {
-  let m = (:)
-  for name in methods {
-    m.insert(name, fn(name))
-  }
-  self + m
-}
-
-// The `fields` method: return a dictionary of field-name -> value for a
-// record instance.
-#let _get_fields_enum(self) = {
-  let out = (:)
-  for (n, t) in self._type._variants.at(self.variant)._fields {
-    out.insert(n, self.payload.at(n))
-  }
-  out
 }
 
 #let _new_enum(self, variant, ..rest) = {
@@ -121,7 +93,7 @@
 }
 
 #let _enum_built-ins = (
-  compare: _compare,
+  compare: _enum_compare,
   new: _new_enum,
   with: _with_enum,
   _register: _register_enum,

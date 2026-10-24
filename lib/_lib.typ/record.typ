@@ -1,4 +1,4 @@
-/ypst-mode: record.typ
+// typst-mode: record.typ
 // A small structural type-system built on top of plain Typst dictionaries.
 //
 // A *record type* is a dictionary carrying three private keys:
@@ -15,78 +15,10 @@
 // Typst types (`int`, `str`, ...) match against `type(value)`.
 
 #import "uid.typ": namespaces, v3
+#import "util.typ": _fetch_method, _match
 
 #let _ns_record = v3(namespaces.oid, "e2487d38-8caa-481f-9a15-a7a3853e1d72")
 #let _record_uuid(name) = v3(_ns_record, name)
-
-// Structural type match: `t` is the expected type, `v` the actual value.
-// Raw types (`int`, `str`, ...) match against `type(v)`; record types match
-// against the type stored in a value's `_type`.
-#let _match(t, v) = {
-  let tv = type(v)
-  if t == none {
-    // `none` means "unconstrained" — any value passes
-    true
-  } else if type(t) == type {
-    // a raw type such as `int` or `str`: compare directly
-    t == tv
-  } else if tv == dictionary and dictionary.keys(v).contains("_type") {
-    // `v` is a record instance: compare its `_type` against the expected one
-    let tv = v.at("_type", default: auto)
-    (t.compare)(tv)
-  } else {
-    // `t` is a record type but `v` is not a record → cannot match
-    false
-  }
-}
-
-// Structural type comparison: every field of `self` must exist in `other`
-// with a matching type. Extra fields on `other` are allowed (asymmetric /
-// structural-subtype behaviour).
-#let _compare(self, other) = {
-  assert(
-    type(other) != type,
-    message: "value `" + repr(other) + "` is not a record, can only compare between records",
-  )
-  // Same `_type_id` → identical declaration, no need to compare fields
-  if self._type_id == other._type_id {
-    return true
-  }
-  let same = true
-  for (name, t) in self._fields {
-    let ot = other._fields.at(name, default: auto)
-    if (ot == auto) {
-      // `other` is missing this field → not a subtype
-      same = false
-      break
-    }
-    same = (
-      same
-        and if type(t) == type {
-          t == ot
-        } else {
-          (t.compare)(ot)
-        }
-    )
-    if not same {
-      break
-    }
-  }
-  same
-}
-
-// Bind a batch of methods into a copy of `self`.
-// `fn(name)` must return a function of shape `(self, ..rest) => ...`; the
-// result maps every method name to `fn(name)`. Callers pass `fn` as the
-// `this_call` closure, which is what keeps `self` pointing at the current
-// (possibly extended) type or instance.
-#let _fetch_method(self, fn, methods) = {
-  let m = (:)
-  for name in methods {
-    m.insert(name, fn(name))
-  }
-  self + m
-}
 
 // The `fields` method: return a dictionary of field-name -> value for a
 // record instance.
@@ -155,9 +87,44 @@
   }
 }
 
+// Structural type comparison: every field of `self` must exist in `other`
+// with a matching type. Extra fields on `other` are allowed (asymmetric /
+// structural-subtype behaviour).
+#let _record_compare(self, other) = {
+  assert(
+    type(other) != type,
+    message: "value `" + repr(other) + "` is not a record, can only compare between records",
+  )
+  // Same `_type_id` → identical declaration, no need to compare fields
+  if self._type_id == other._type_id {
+    return true
+  }
+  let same = true
+  for (name, t) in self._fields {
+    let ot = other._fields.at(name, default: auto)
+    if (ot == auto) {
+      // `other` is missing this field → not a subtype
+      same = false
+      break
+    }
+    same = (
+      same
+        and if type(t) == type {
+          t == ot
+        } else {
+          (t.compare)(ot)
+        }
+    )
+    if not same {
+      break
+    }
+  }
+  same
+}
+
 // Built-in methods every record type gets.
 #let _record_built-ins = (
-  compare: _compare,
+  compare: _record_compare,
   new: _new_record,
   update: _update_record,
   with: _with_record,
