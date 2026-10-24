@@ -49,6 +49,9 @@
     parts.push(link(_destination(parent, indexers()), "[back]"))
   }
   block(above: 0.3em, below: 0.6em, text(size: 0.9em, fill: _meta-color, parts.join(" · ")))
+  if doc.abstract != "" {
+    block(above: 0.6em, below: 1em, doc.abstract)
+  }
 }
 
 // A separate cover does not register the heading label a second time.
