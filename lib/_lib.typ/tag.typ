@@ -31,21 +31,21 @@
   // a closure defined before `impl` finishes would otherwise capture the
   // bare, method-less type.
   sub: (self, name) => {
+    let id = _tag_uuid(self.id + ":" + name)
     (self._type.new)(
       _parent: self.id,
-      id: _tag_uuid(name),
+      id: id,
       name: name,
-      documents: _mkstate("a61f608d-7f35-4ff9-a9a6-65ba40dffc2f", (:)),
+      documents: _mkstate(id, (:)),
     )
   },
-  // Attach a document to this tag. `documents` is a dictionary keyed by
-  // document id, so attaching the same document again is a no-op — necessary
-  // because meta re-runs during layout passes, and re-reading the slot at the
-  // same location can return a stale value.
-  add-doc: (self, doc) => context {
-    let cur = (self.documents.get)()
-    cur.insert(doc.id, doc)
-    (self.documents.update)(cur)
+  // Attach a document by id. Functional updates accumulate documents without
+  // depending on a contextual read from a previous layout pass.
+  add-doc: (self, doc) => {
+    (self.documents.update)(cur => {
+      cur.insert(doc.id, doc)
+      cur
+    })
   },
   get-doc: self => {
     (self.documents.get)()
@@ -73,7 +73,7 @@
           _parent: "",
           id: "root",
           name: "root",
-          documents: _mkstate(tags.join("-") + "f8480bdb-6c76-44b5-a0a3-211e55105521", (:)),
+          documents: _mkstate(tags.join("-") + ":" + "f8480bdb-6c76-44b5-a0a3-211e55105521", (:)),
         )
         let out = (root,)
         for t in tags {

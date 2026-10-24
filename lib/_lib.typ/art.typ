@@ -1,7 +1,6 @@
-#import "doc.typ": _core_doc
+#import "doc.typ": _core_doc, _doc_uuid, current, documents
 #import "types.typ": image
 #import "categories.typ": category
-#import "style.typ": _page_info
 
 // Declare a document. Most arguments map 1:1 onto `_Core_doc` fields and
 #let meta(
@@ -24,47 +23,52 @@
   category: category.null,
   tags: (),
   tlb: (:),
-) = context {
-  let doc = (_core_doc.new)(
-    id: id,
-    parent_id: parent_id,
-    did: _doc_uuid(id),
+) = {
+  context {
+    let doc = (_core_doc.new)(
+      id: id,
+      parent_id: parent_id,
+      did: _doc_uuid(id),
 
-    title: title,
-    authors: authors,
+      title: title,
+      authors: authors,
 
-    date: date,
-    lang: lang,
-    version: version,
-    doi: doi,
-    abstract: abstract,
-    keywords: keywords,
-    license: license,
+      date: date,
+      lang: lang,
+      version: version,
+      doi: doi,
+      abstract: abstract,
+      keywords: keywords,
+      license: license,
 
-    description: description,
-    cover_image: cover_image,
+      description: description,
+      cover_image: cover_image,
 
-    category: category,
+      category: category,
 
-    tags: tags,
+      tags: tags,
 
-    tlb: tlb,
+      tlb: tlb,
 
-    loc: here(),
-  )
-  // Attach the document to every tag it lists
-  for t in tags {
-    (t.add-doc)(doc)
+      loc: here(),
+    )
+    // Attach the document to every tag it lists
+    for t in tags {
+      (t.add-doc)(doc)
+    }
+
+    // Register under its id, and make it the current document
+    (documents.update)(dc => {
+      dc + ((id): doc)
+    })
+
+    (current.update)(
+      doc,
+    )
+    [#metadata(id) <typst-mode-document-id>]
   }
-
-  // Register under its id, and make it the current document
-  let dc = (documents.get)()
-  assert(not id in dc, message: "ERROR: duplicate document id: `" + id + "`")
-  (documents.update)(
-    dc + ((id): doc),
-  )
-
-  (current.update)(
-    doc,
-  )
+  context {
+    let matches = query(<typst-mode-document-id>).filter(m => m.value == id)
+    assert(matches.len() == 1, message: "ERROR: duplicate document id: `" + id + "`")
+  }
 }

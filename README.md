@@ -41,6 +41,54 @@ Root: /                         ; Project root
 
 ## Usage
 
+```typst
+#import "/lib/_lib.typ/lib.typ": *
+#show: template
+
+#let (root, science, mathematics) = (tag.register)(
+  "computer-science", "mathematics",
+)
+#meta(
+  id: "index",
+  title: [My notes],
+  authors: ([Author name],),
+  tags: (science, mathematics),
+)
+#mkcover()
+#mkheading()
+
+#lookup("definition", [Jump to the definition])
+#mkindex("definition", [A definition])
+#embed(include "child.typ")
+#render-index()
+```
+
+Each included note declares its own `meta(...)` and calls `mkheading()`.
+`embed` increases heading levels and restores the enclosing document afterward.
+Paths in `include` resolve relative to the calling file. Use
+`mkheading(new-page: false)` to keep a note on the current page.
+
+`mkheading` registers the document ID as a global label, shows the title and
+slug, authors, date, tags, and parent link. `template` provides the A4 layout
+and previous/up/next navigation. `mkcover` renders an optional cover image
+and abstract. `render-index(show-backlinks: false)` hides backlink lists.
+Navigation links do not count as backlinks; explicit `lookup` calls do.
+
+When migrating from Wishful-Thinking:
+
+- Put old category names into regular `tag` objects and pass them in `tags`.
+  The publication `category` enum remains separate and optional.
+- Use `authors: ([Author name],)` even for one author; a scalar is rejected.
+- Replace `mkheader()` with `mkheading()`.
+- Use `mkindex(label, content)` and `lookup(label, content)` with globally
+  unique labels. There is no automatic document prefix or old `index` API.
+- Use `embed(include "path.typ")` instead of passing a filename string.
+- Read `(current.get)()`, `(documents.final)()`, and `indexers()` directly.
+- Extra document data lives in `tlb`; `tlb: (taxon: "theorem")` adds a taxon
+  prefix above the note heading. Abstract and description are strings.
+
+Run the rendering integration checks with `node tests/render/check.mjs`.
+
 ## Plans
 
 ## Related Efforts

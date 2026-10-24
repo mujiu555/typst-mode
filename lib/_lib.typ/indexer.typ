@@ -46,21 +46,27 @@
 
 // Register a label at the current location. Duplicate labels are rejected —
 // this fails compilation instead of silently shadowing.
-#let mkindex(label, content) = context {
-  let loc = here()
-  let cont = (_labels.get)()
-  assert(not label in cont, message: "EROOR: duplicate label: `" + label + "`")
-  let index = (_indexer.new)(
-    label: label,
-    loc: loc,
-    content: content,
-  )
+#let mkindex(label, content) = {
+  context {
+    let loc = here()
+    let index = (_indexer.new)(
+      label: label,
+      loc: loc,
+      content: content,
+    )
 
-  (_labels.update)(
-    cont + ((label): index),
-  )
-
-  content
+    (_labels.update)(cont => {
+      cont + ((label): index)
+    })
+    [#metadata(label) <typst-mode-index-label>]
+    content
+  }
+  // Keep validation separate from registration so a failed validation cannot
+  // remove the state update and oscillate between layout passes.
+  context {
+    let matches = query(<typst-mode-index-label>).filter(m => m.value == label)
+    assert(matches.len() == 1, message: "ERROR: duplicate label: `" + label + "`")
+  }
 }
 
 // Look up a previously registered label and render a link to it.
@@ -76,7 +82,7 @@
 }
 
 #let backlinks(label) = {
-  (_refrecs.final)().at(label)
+  (_refrecs.final)().at(label, default: ())
 }
 
 #let indexers() = {

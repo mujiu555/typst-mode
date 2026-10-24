@@ -26,7 +26,7 @@
     final: self => {
       _s.final()
     },
-    update: (self, var) => context {
+    update: (self, var) => {
       _s.update(
         var,
       )

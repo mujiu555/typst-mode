@@ -1,7 +1,7 @@
 // typst-mode: doc.typ
 // Document metadata system.
 //
-// `meta(...)` declares a document: it builds a `_Core_doc` record from the
+// `meta(...)` in art.typ declares a document: it builds a `_core_doc` record from the
 // given metadata, stamps it with a UUID-derived `did`, attaches it to any
 // tags, registers it in the `documents` store, and makes it the `current`
 // document. Documents are referenced by id elsewhere (e.g. by tag.typ and
@@ -41,7 +41,7 @@
   did: str,
 
   title: content,
-  authors: array, // list of author
+  authors: array, // content/string names or author records; always an array
 
   date: datetime,
   lang: str,
