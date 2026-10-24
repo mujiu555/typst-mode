@@ -1,13 +1,15 @@
 {
-  description = "A very basic flake";
-
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-25.11&shallow=1";
+    nixpkgs.url = "https://channels.nixos.org/nixos-26.05/nixexprs.tar.zst";
   };
 
   outputs =
-    inputs:
+    inputs@{
+      self,
+      nixpkgs,
+      ...
+    }:
     inputs.flake-utils.lib.eachDefaultSystem (
       system:
       let
@@ -16,12 +18,10 @@
       {
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
+            typst
+            tinymist
             nodejs
           ];
-          shellHook = ''
-            export PATH="$PWD/node_modules/.bin/:$PATH"
-            export NPM_PACKAGES="$PWD/.npm-packages"
-          '';
         };
       }
     );

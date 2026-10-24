@@ -1,4 +1,4 @@
-# Typst Mode -- 捏它自 Org Mode
+# typst-mode
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![conventional commit compliant](https://img.shields.io/badge/git%20commit-conventional%20commit-brightgreen.svg?style=flat-square)](https://www.conventionalcommits.org/en/v1.0.0/#specification)
@@ -6,62 +6,103 @@
 
 ## Background
 
-This is a project that inspired by org-mode of Emacs.
-Aiming adding more functions other than purely text processing ability into Typst.
-
-After all, it is a Turing complete language.
-
-Since org-mode providing quite a lot of convenient functions that can cooperated
-with Emacs.
-However, the org-mode acts only as a regular markup language and is not that easy
-to extend it without hack.
-Furthermore, the org-mode can only work fine with Emacs,
-even I' m a user of Emacs and \[Neo\]Vim, I still think it is not a good practice.
-
-Initially, this is just a part of my note taking project [Wishful-Thinking](https://github.com/mujiu555/Wishful-Thinking).
-To providing a good meta data management and, paragraph index ability.
-Then, I realized that it is a good opportunity to providing something more than meta
-data management.
-
 ### Referencing
 
-1. Inspiration from: [Org-Mode](https://orgmode.org/)
-2. Initial Code: Myself, [Wishful-Thinking](https://github.com/mujiu555/Wishful-Thinking)
+### Credit: Code/Library
 
-This will keep same until i finish this project and
-adopt original one to use this library.
-
-## Install
-
-Not Yet.
+1. [digestify](https://github.com/ParaN3xus/digestify.git):
+  License: MIT, no NOTICE provided
 
 ## Structure
 
+The whole project is organized in following structure:
+
 ```txt
-+ typst-mode/
-| + lib/_lib.typ/
-| | + lib.typ
+Root: /                         ; Project root
++- .git/                        ; git repository
++- .github/
+|  +- workflows/                ; CI/CD configuration
++- doc/                         ; documentation & copyright information
+|  +- licenses/                 ; licenses and notice form other libraries
+|  +- LICENSE                   ; copy of the LICENSE
+|  +- LICENSE.apache            ; copy of the original LICENSE
+|  +- README                    ; README for directory `doc`
+|  +- README.commit.md          ; git commit convention
+|  +- README.gitflow.md         ; git flow convention
+|  +- README.release.md         ; semantic versioning 
++- lib/                         ; libraries
+|  +- _lib.typ/                 ; source code
++- .gitignore
++- .gitmodules
++- LICENSE
++- README.md
++- typst.toml                   ; library spec
 ```
 
 ## Usage
 
 ```typst
 #import "/lib/_lib.typ/lib.typ": *
+#show: template
+
+#let (root, science, mathematics) = (tag.register)(
+  "computer-science", "mathematics",
+)
+#meta(
+  id: "index",
+  title: [My notes],
+  authors: ([Author name],),
+  tags: (science, mathematics),
+)
+#mkcover()
+#mkheading()
+
+#lookup("definition", [Jump to the definition])
+#mkindex("definition", [A definition])
+#embed(include "child.typ")
+#render-index()
 ```
+
+Each included note declares its own `meta(...)` and calls `mkheading()`.
+`embed` increases heading levels and restores the enclosing document afterward.
+Paths in `include` resolve relative to the calling file. Use
+`mkheading(new-page: false)` to keep a note on the current page.
+
+`mkheading` registers the document ID as a global label, shows the title and
+slug, authors, date, tags, and parent link. `template` provides the A4 layout
+and previous/up/next navigation. `mkcover` renders an optional cover image
+and abstract. `render-index(show-backlinks: false)` hides backlink lists.
+Navigation links do not count as backlinks; explicit `lookup` calls do.
+
+When migrating from Wishful-Thinking:
+
+- Put old category names into regular `tag` objects and pass them in `tags`.
+  The publication `category` enum remains separate and optional.
+- Use `authors: ([Author name],)` even for one author; a scalar is rejected.
+- Replace `mkheader()` with `mkheading()`.
+- Use `mkindex(label, content)` and `lookup(label, content)` with globally
+  unique labels. There is no automatic document prefix or old `index` API.
+- Use `embed(include "path.typ")` instead of passing a filename string.
+- Read `(current.get)()`, `(documents.final)()`, and `indexers()` directly.
+- Extra document data lives in `tlb`; `tlb: (taxon: "theorem")` adds a taxon
+  prefix above the note heading. Abstract and description are strings.
+
+Run the rendering integration checks with `node tests/render/check.mjs`.
 
 ## Plans
 
-We'd providing:
-
-- [ ] Meta Data Management
-
 ## Related Efforts
+
+1. [Typsy](https://github.com/patrick-kidger/typsy)
 
 ## Maintainers
 
 [github@mujiu555(暮玖)](https://github.com/mujiu555)
 
 ## Contributing
+
+You may pull all repository and walk through any part you interested in.
+Make Pr if you have found any problem or have method to improve those notes.
 
 ## License
 
