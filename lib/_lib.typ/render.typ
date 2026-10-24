@@ -1,15 +1,19 @@
 #import "doc.typ": current, documents
-#import "indexer.typ": mkindex, backlinks, indexers
+#import "indexer.typ": backlinks, indexers, mkindex
 
 #let _meta-color = rgb("#999")
 #let _taxon-color = rgb("#555")
 
-#let _slug(body) = text(size: 0.9em, fill: rgb("#888"),
-  underline(stroke: (thickness: 0.5pt, dash: ("dot", 1pt)), body))
+#let _slug(body) = text(size: 0.9em, fill: rgb("#888"), underline(stroke: (thickness: 0.5pt, dash: ("dot", 1pt)), body))
 
-#let _authors(doc) = doc.authors.map(a => {
-  if type(a) == dictionary { a.name } else { a }
-}).join(", ")
+#let _authors(doc) = (
+  doc
+    .authors
+    .map(a => {
+      if type(a) == dictionary { a.name } else { a }
+    })
+    .join(", ")
+)
 
 #let _details(doc) = {
   let parts = ()
@@ -32,18 +36,19 @@
   if new-page { pagebreak(weak: true) }
   let taxon = if type(doc.tlb) == dictionary { doc.tlb.at("taxon", default: none) }
   if taxon != none and taxon != "" {
-    block(above: 0.8em, text(weight: 600, fill: _taxon-color,
-      upper(taxon.at(0)) + taxon.slice(1) + "."))
+    block(above: 0.8em, text(weight: 600, fill: _taxon-color, upper(taxon.at(0)) + taxon.slice(1) + "."))
   }
-  heading(depth: 1, block(below: 0.3em,
-    text(weight: 600, mkindex(doc.id, doc.title)) + h(0.5em) + _slug("[" + doc.id + "]")))
+  // Register outside the heading body: outlines replay that body.
+  mkindex(doc.id, heading(depth: 1, block(
+    below: 0.3em,
+    text(weight: 600, doc.title) + h(0.5em) + _slug("[" + doc.id + "]"),
+  )))
   let parts = _details(doc)
   let parent = (documents.final)().at(doc.parent_id, default: none)
   if parent != none and parent.id != doc.id {
     parts.push(link(_destination(parent, indexers()), "[back]"))
   }
-  block(above: 0.3em, below: 0.6em,
-    text(size: 0.9em, fill: _meta-color, parts.join(" · ")))
+  block(above: 0.3em, below: 0.6em, text(size: 0.9em, fill: _meta-color, parts.join(" · ")))
 }
 
 // A separate cover does not register the heading label a second time.
@@ -109,7 +114,8 @@
       if doc.tags.len() > 0 { parts.push(doc.tags.map(t => t.name).join(", ")) }
       parts.push(doc.date.display("[year]-[month]-[day]"))
       text(size: 0.75em, fill: _meta-color, grid(
-        columns: (auto, 1fr), gutter: 1em,
+        columns: (auto, 1fr),
+        gutter: 1em,
         align(left, nav.join(" ")), align(right, parts.join(" · ")),
       ))
     }

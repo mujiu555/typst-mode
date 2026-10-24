@@ -28,9 +28,29 @@
   (:),
 )
 
-#let current = _mkstate(
+#let _current_stack = _mkstate(
   "4425dff9-79cf-48e7-8868-1a99688d1635",
-  (:),
+  ((:),),
+)
+
+// Embedding saves/restores the stack with functional updates. Capturing a
+// contextual current.get() for each sibling requires one layout pass per
+// sibling and does not converge for a large collection of notes.
+#let current = (
+  get: () => (_current_stack.get)().last(),
+  final: () => (_current_stack.final)().last(),
+  at: loc => (_current_stack.at)(loc).last(),
+  update: value => (_current_stack.update)(stack => {
+    let old = stack.pop()
+    stack.push(if type(value) == function { value(old) } else { value })
+    stack
+  }),
+  enter: () => (_current_stack.update)(stack => stack + (stack.last(),)),
+  leave: () => (_current_stack.update)(stack => {
+    assert(stack.len() > 1, message: "Cannot leave the root document scope")
+    let _ = stack.pop()
+    stack
+  }),
 )
 
 // The metadata schema: the core fields a `meta` document carries.
