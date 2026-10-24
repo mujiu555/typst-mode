@@ -1,46 +1,37 @@
-#import "record.typ": impl, record
+#import "record.typ": impl_record, record
+#import "uid.typ": namespaces, v3
 
-#let _global = state("a1a3ae8c-ec33-4646-8643-afbc3c0a2f6b", ())
+// Just prevent user from using names used in this library is ok....
 
-#let _at(self, i) = {
-  for (key, val) in i {
-    if key == self.sym {
-      return val
-    }
-  }
-  self.default
-}
+#let _ns_state = v3(namespaces.oid, "70c5f11c-7b79-4e76-b581-b78cb430c26c")
+#let _state_uuid(name) = v3(_ns_state, name)
 
 #let _state = record(
-  sym: function,
-  default: none,
+  sym: str,
 )
 
-#let _state = impl(
-  _state,
-  at: (self, loc) => {
-    _at(self, _global.at(loc))
-  },
-  final: self => {
-    _at(self, _global.final())
-  },
-  get: self => {
-    _at(self, _global.get())
-  },
-  update: (self, value) => context {
-    let new = ()
-    let found = false
-    for (key, val) in _global.at(here()) {
-      if key == self.sym {
-        new.push((key, value))
-        found = true
-      } else {
-        new.push((key, val))
-      }
-    }
-    if not found {
-      new.push((self.sym, value))
-    }
-    _global.update(new)
-  },
-)
+#let _mkstate(sym, init) = {
+  let sym = _state_uuid(sym)
+
+  let _s = state(sym, init)
+
+  let s_state = impl_record(
+    _state,
+    get: self => {
+      _s.get()
+    },
+    at: (self, lab) => {
+      _s.at(lab)
+    },
+    final: self => {
+      _s.final()
+    },
+    update: (self, var) => {
+      _s.update(
+        var,
+      )
+    },
+  )
+
+  (s_state.new)(sym: sym)
+}
