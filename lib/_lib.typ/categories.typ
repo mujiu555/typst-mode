@@ -5,11 +5,11 @@
 // article is `category.journal(journal: ..., volume: ..., ...)`.
 
 #import "record.typ": record
-#import "enum.typ": enum
+#import "enum.typ": enumerator
 
 // Tagged union: `variant` selects the publication type, `content` carries
 // the type-specific fields.
-#let category = enum(
+#let category = enumerator(
   "Publication category",
   journal: record(
     journal: str,

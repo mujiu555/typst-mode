@@ -65,11 +65,19 @@
       image(doc.cover_image.payload.p, width: 60%)
       v(1em)
     }
+    #if doc.cover_image.variant == "data" {
+      image(doc.cover_image.payload.p, width: 60%)
+      v(1em)
+    }
     #text(size: 2em, weight: 600, doc.title)
     #v(1em)
     #text(fill: _meta-color, _details(doc).join(" · "))
     #if doc.abstract != "" { block(above: 2em, doc.abstract) }
     #v(1fr)
+
+    #title(doc.title)
+    #set document(author: doc.authors, date: doc.date, description: doc.description, keywords: doc.keywords)
+
   ]
   pagebreak(weak: true)
 }
@@ -79,7 +87,7 @@
   heading(outlined: false, title)
   for (name, entry) in indexers() {
     block[
-      #link(entry.loc, entry.content)
+      #link(entry.loc, entry.label)
       #if show-backlinks {
         let refs = backlinks(name)
         if refs.len() > 0 {

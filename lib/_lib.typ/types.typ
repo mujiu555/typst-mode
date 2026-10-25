@@ -1,6 +1,6 @@
 
 #import "record.typ": record
-#import "enum.typ": enum
+#import "enum.typ": enumerator, impl_enum
 
 // Author schema (not yet validated/used by `meta`, kept for the record
 // layer).
@@ -11,9 +11,9 @@
   orcid: str,
 )
 
-#let image = enum(
-  path: record(p: str),
+#let img = enumerator(
+  path: record(p: str), // TODO: use path
+  data: record(p: bytes), // user to read the file `(img.data)(p: read("file"))`
   null: record(),
 )
-#let image = image + (null: (image.null)())
-
+#let img = img + (null: (img.null)())

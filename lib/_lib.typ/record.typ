@@ -15,7 +15,7 @@
 // Typst types (`int`, `str`, ...) match against `type(value)`.
 
 #import "uid.typ": namespaces, v3
-#import "util.typ": _fetch_method, _match
+#import "util.typ": _fetch_method, _match, _type_accepts, _is_type
 
 #let _ns_record = v3(namespaces.oid, "e2487d38-8caa-481f-9a15-a7a3853e1d72")
 #let _record_uuid(name) = v3(_ns_record, name)
@@ -91,30 +91,21 @@
 // with a matching type. Extra fields on `other` are allowed (asymmetric /
 // structural-subtype behaviour).
 #let _record_compare(self, other) = {
-  assert(
-    type(other) != type,
-    message: "value `" + repr(other) + "` is not a record, can only compare between records",
-  )
+  if type(other) != dictionary { return false }
+  if not ("_type_id" in other) { return false }
+  if type(other.at("_fields", default: none)) != dictionary { return false }
   // Same `_type_id` → identical declaration, no need to compare fields
   if self._type_id == other._type_id {
     return true
   }
   let same = true
   for (name, t) in self._fields {
-    let ot = other._fields.at(name, default: auto)
-    if (ot == auto) {
+    if not (name in other._fields) {
       // `other` is missing this field → not a subtype
       same = false
       break
     }
-    same = (
-      same
-        and if type(t) == type {
-          t == ot
-        } else {
-          (t.compare)(ot)
-        }
-    )
+    same = _type_accepts(t, other._fields.at(name))
     if not same {
       break
     }
@@ -155,6 +146,9 @@
 #let record(..fields) = {
   let _description = arguments.pos(fields).join("\n")
   let _fields = arguments.named(fields)
+  for (name, ty) in _fields {
+    assert(_is_type(ty), message: "field `" + name + "`: expected a type; use an enum for alternatives")
+  }
 
   // The "type" is itself just a dictionary: a UUID identifying it, the
   // declared field map, and a method registry seeded with the `fields`

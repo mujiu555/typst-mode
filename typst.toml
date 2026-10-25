@@ -1,11 +1,11 @@
 [package]
-name = "typst-mode"
+name = ""
 version = "0.1.0"
 entrypoint = "lib/_lib.typ/lib.typ"
-authors = ["GitHub@Mujjiu555"]
+authors = ["GitHub@mujiu555"]
 license = "Apache-2.0"
 description = ""
-homepage = ""
+homepage = "https://github.com/mujiu555/typst-mode"
 repository = "https://github.com/mujiu555/typst-mode"
 keywords = ["enhancement"]
 

@@ -8,9 +8,9 @@
 // by a future bibliography/record layer).
 
 #import "uid.typ": namespaces, v3
-#import "types.typ": author, image
+#import "types.typ": author, img
 #import "record.typ": record
-#import "enum.typ": enum
+#import "enum.typ": enumerator
 #import "categories.typ": category
 #import "tag.typ": tag
 #import "state.typ": _mkstate, _state
@@ -72,13 +72,13 @@
   license: str,
 
   description: str,
-  cover_image: image,
+  cover_image: img,
 
   category: category,
 
   tags: array,
 
-  tlb: none,
+  tlb: dictionary,
 
   loc: location,
 )

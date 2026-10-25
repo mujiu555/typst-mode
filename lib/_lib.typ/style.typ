@@ -1,8 +1,8 @@
-#import "types.typ": image
+#import "types.typ": img
 #import "record.typ": record
-#import "enum.typ": enum
+#import "enum.typ": enumerator
 #import "record.typ": impl_record, record
-#import "enum.typ": enum, impl_enum
+#import "enum.typ": enumerator, impl_enum
 #import "uid.typ": namespaces, v3
 #import "state.typ": _mkstate
 
@@ -15,7 +15,7 @@
 )
 
 #let _page_size = {
-  let _page_size = enum(
+  let _page_size = enumerator(
     a0: record(),
     a1: record(),
     a10: record(),
@@ -289,7 +289,7 @@
     )
 )
 
-#let _numbering_style = enum(
+#let _numbering_style = enumerator(
   num: record(
     prefix: str,
     fmt: str,
@@ -387,8 +387,8 @@
   header-ascent: relative,
 
   fill: color,
-  background: image,
-  foreground: image,
+  background: img,
+  foreground: img,
 
   footer: function,
   header: function,

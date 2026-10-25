@@ -1,5 +1,5 @@
 #import "doc.typ": _core_doc, _doc_uuid, current, documents
-#import "types.typ": image
+#import "types.typ": img
 #import "categories.typ": category
 
 // Declare a document. Most arguments map 1:1 onto `_Core_doc` fields and
@@ -19,7 +19,7 @@
   license: "apache-v2",
   //
   description: "",
-  cover_image: image.null,
+  cover_image: img.null,
   category: category.null,
   tags: (),
   tlb: (:),
