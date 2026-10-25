@@ -1,3 +1,4 @@
+// INTERNAL DIAGNOSTIC: _register is now explicitly private, not a supported extension API.
 // Function test: regressions/enum/register_compare
 // Manual: typst compile --root . tests/regressions/enum/register_compare.typ /tmp/typst-unit-test.pdf
 // Regression: asserts intended behavior; currently fails in the library.

@@ -1,3 +1,5 @@
+#import "/tests/fixtures/rendered_text.typ": observe-text, rendered-text
+#show text: observe-text
 // Manual: typst compile --root . tests/art/meta_all_fields.typ /tmp/typst-expanded-test.pdf
 // Expected: successful compilation and all assertions pass.
 #import "/lib/_lib.typ/lib.typ": *
@@ -34,7 +36,7 @@ tlb: (taxon: "note", extra: "custom"))
 #mkcover()
 #mkheading(new-page: false)
 #context {
- assert.eq(query(title).first().body, expected.title)
+ assert.eq(rendered-text().matches(regex("Complete metadata")).len(), 2, message: "One cover title and one heading")
  assert.eq(query(heading).len(), 1)
  assert.eq(indexers().keys(), (expected.id,))
  assert.eq(query(image).len(), 1)

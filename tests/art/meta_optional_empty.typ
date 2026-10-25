@@ -15,4 +15,4 @@
 }
 #mkheading(new-page: false)
 #mkcover()
-#context assert.eq(query(title).len(), 1)
+#context assert.eq((current.get)().title, [])

@@ -1,3 +1,5 @@
+// HISTORICAL API CHECK: display/render methods were removed from style.typ.
+// Missing-method failures mean the feature is unavailable, not that the old implementation still runs.
 // Function test: regressions/style/numbering_null
 // Manual: typst compile --root . tests/regressions/style/numbering_null.typ /tmp/typst-unit-test.pdf
 // Regression: asserts intended behavior; currently fails in the library.
