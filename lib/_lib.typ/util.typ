@@ -3,15 +3,36 @@
 //   _match        — does a value `v` match an expected type `t`?
 //   _fetch_method — bind a batch of methods into a copy of `self`.
 
+// Reserve actual implementation keys, not all underscore-prefixed names:
+// application fields such as a tag's `_parent` remain valid.
+#let _type_reserved_names = (
+  "_type",
+  "_type_id",
+  "_fields",
+  "_variants",
+  "_methods",
+  "_register",
+)
+
+#let _check_names(names, forbidden) = {
+  for name in names {
+    assert(
+      not (name in forbidden),
+      message: "name `" + name + "` conflicts with a reserved name or data field",
+    )
+  }
+}
+
 // Valid schemas are native types or custom record/enum types, never wildcards.
 #let _is_type(t) = {
   if type(t) == type { return true }
   if type(t) != dictionary { return false }
-  (("_type_id" in t)
-    and (type(t.at("_fields", default: none)) == dictionary
-      or type(t.at("_variants", default: none)) == dictionary)
-    and type(t.at("new", default: none)) == function
-    and type(t.at("compare", default: none)) == function)
+  (
+    ("_type_id" in t)
+      and (type(t.at("_fields", default: none)) == dictionary or type(t.at("_variants", default: none)) == dictionary)
+      and type(t.at("new", default: none)) == function
+      and type(t.at("compare", default: none)) == function
+  )
 }
 
 // Compare type descriptions without implicit wildcard types.

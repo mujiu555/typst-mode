@@ -55,6 +55,7 @@
 }
 
 // A separate cover does not register the heading label a second time.
+// users must make sure that document/book authors are strings rather than contents that may provided for mkheading
 #let mkcover() = context {
   let doc = (current.get)()
   assert("id" in doc, message: "Call meta before mkcover")
@@ -75,8 +76,13 @@
     #if doc.abstract != "" { block(above: 2em, doc.abstract) }
     #v(1fr)
 
-    #title(doc.title)
-    #set document(author: doc.authors, date: doc.date, description: doc.description, keywords: doc.keywords)
+    #set document(
+      title: doc.title,
+      author: doc.authors,
+      date: doc.date,
+      description: doc.description,
+      keywords: doc.keywords,
+    )
 
   ]
   pagebreak(weak: true)

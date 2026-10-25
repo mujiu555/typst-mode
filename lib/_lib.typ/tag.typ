@@ -67,20 +67,15 @@
 #let tag = (
   tag
     + (
-      register: (..tags) => {
-        let tags = arguments.pos(tags)
+      register: (namespace, ..tags) => {
+        let root_id = _tag_uuid(repr(("registration", namespace)))
         let root = (tag.new)(
           _parent: "",
-          id: "root",
+          id: root_id,
           name: "root",
-          documents: _mkstate(tags.join("-") + ":" + "f8480bdb-6c76-44b5-a0a3-211e55105521", (:)),
+          documents: _mkstate(root_id + ":" + "f8480bdb-6c76-44b5-a0a3-211e55105521", (:)),
         )
-        let out = (root,)
-        for t in tags {
-          let n = (root.sub)(t)
-          out.push(n)
-        }
-        out
+        (root,) + arguments.pos(tags).map(name => (root.sub)(name))
       },
     )
 )

@@ -15,7 +15,7 @@
 // Typst types (`int`, `str`, ...) match against `type(value)`.
 
 #import "uid.typ": namespaces, v3
-#import "util.typ": _fetch_method, _match, _type_accepts, _is_type
+#import "util.typ": _check_names, _fetch_method, _is_type, _match, _type_accepts, _type_reserved_names
 
 #let _ns_record = v3(namespaces.oid, "e2487d38-8caa-481f-9a15-a7a3853e1d72")
 #let _record_uuid(name) = v3(_ns_record, name)
@@ -25,7 +25,11 @@
 #let _get_fields_record(self) = {
   let out = (:)
   for (n, t) in self._type._fields {
-    out.insert(n, self.at(n))
+    if type(t) == type {
+      out.insert(n, self.at(n))
+    } else {
+      out.insert(n, (self.at(n).fields)())
+    }
   }
   out
 }
@@ -36,8 +40,17 @@
 // 3. re-bind every method so `self` is this instance (with its own bound
 //    methods), which lets methods call each other.
 #let _new_record(self, ..rest) = {
+  assert(arguments.pos(rest).len() == 0, message: "record construictor accepts named fields only")
+
+  for name in arguments.named(rest).keys() {
+    assert(
+      name in self._fields,
+      message: "unknown record field `" + name + "`",
+    )
+  }
   let instance = (_type: self)
 
+  // field must have a explicit type, if you need null for a field, use enum
   for (f, ty) in self._fields {
     let v = rest.at(f, default: none)
     assert(v != none, message: "field `" + f + "`: not exist:" + repr(rest))
@@ -67,11 +80,19 @@
 // Copy-and-replace update: validate every field of `instance`, then construct
 // a new instance overriding the given fields.
 #let _update_record(self, instance, ..rest) = {
+  assert(arguments.pos(rest).len() == 0, message: "record construictor accepts named fields only")
+
+  for name in arguments.named(rest).keys() {
+    assert(
+      name in self._fields,
+      message: "unknown record field `" + name + "`",
+    )
+  }
   let newobj = (:)
 
   for (k, expected-type) in self._fields {
-    let value = instance.at(k, default: auto)
-    assert(value != auto)
+    let value = instance.at(k, default: none)
+    assert(value != none)
     assert(_match(expected-type, value))
     newobj.insert(k, value)
   }
@@ -146,6 +167,9 @@
 #let record(..fields) = {
   let _description = arguments.pos(fields).join("\n")
   let _fields = arguments.named(fields)
+
+  _check_names(_fields.keys(), _type_reserved_names + ("fields",))
+
   for (name, ty) in _fields {
     assert(_is_type(ty), message: "field `" + name + "`: expected a type; use an enum for alternatives")
   }
@@ -177,6 +201,13 @@
 // This implementation makes rebind (decorate) method possible
 #let impl_record(ty, ..fns) = {
   let fns = arguments.named(fns)
+
+  // Type-level built-ins and instance methods are separate: an instance
+  // `update` method is valid (state.typ uses it). Data and metadata are not.
+  _check_names(
+    fns.keys(),
+    _type_reserved_names + ("fields", "description") + ty._fields.keys(),
+  )
 
   for (name, fn) in fns {
     assert(type(fn) == function)

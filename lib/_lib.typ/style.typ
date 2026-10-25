@@ -129,19 +129,6 @@
     ),
   )
 
-  _page_size = impl_enum(
-    _page_size,
-    display: self => {
-      it => {
-        if "custom" == self.variant {
-          set page(width: self.payload.width, height: self.payload.height)
-        } else {
-          set page(paper: self.variant)
-        }
-      }
-    },
-  )
-
   _page_size = (
     _page_size
       + (
@@ -267,20 +254,6 @@
   right: length,
 )
 
-#let _margin_info = impl_record(
-  _margin_info,
-  display: self => {
-    it => {
-      set page(margin: (
-        top: self.top,
-        bottom: self.bottom,
-        left: self.left,
-        right: self.right,
-      ))
-    }
-  },
-)
-
 #let _margin_info = (
   _margin_info
     + (
@@ -308,39 +281,6 @@
 
 #let _numbering_style = impl_enum(
   _numbering_style,
-  display: self => {
-    it => {
-      if (self.variant == "num") {
-        set page(numbering: self.payload.prefix + self.payload.fmt + self.payload.suffix)
-      } else if (self.variant == "num_both") {
-        set page(
-          numbering: self.payload.prefix
-            + self.payload.fmt
-            + self.payload.mid
-            + self.payload.final_fmt
-            + self.payload.suffix,
-        )
-      } else if (null == self.variant) {} else {
-        set page(numbering: self.payload)
-      }
-      it
-    }
-  },
-  render: self => context {
-    if (self.variant == "num_both") {
-      let p = self.payload
-      counter(page).display(
-        p.prefix + p.fmt + p.mid + p.final_fmt + p.suffix,
-        both: true,
-      )
-    } else if (self.variant == "num") {
-      counter(page).display()
-    } else if (null == self.variant) {
-      none
-    } else {
-      counter(page).display()
-    }
-  },
 )
 
 #let _numbering_style = (
@@ -396,23 +336,6 @@
   numbering: _numbering_style,
 
   supplement: str,
-)
-
-#let _page_info = impl_record(
-  _page_info,
-  display: self => {
-    it => {
-      let it = (self.margin.display)((self.size.display)(it))
-      if self.background.variant == "path" {
-        set page(background: self.background.payload)
-      }
-      if self.foreground.variant == "path" {
-        set page(foreground: self.foreground.payload)
-      }
-      set page(flipped: self.flipped, header-ascent: self.header-ascent, footer-descent: self.footer-descent)
-      it
-    }
-  },
 )
 
 text(

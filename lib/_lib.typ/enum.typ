@@ -1,5 +1,5 @@
 #import "uid.typ": namespaces, v3
-#import "util.typ": _fetch_method, _match, _type_accepts, _is_type
+#import "util.typ": _check_names, _fetch_method, _is_type, _match, _type_accepts, _type_reserved_names
 
 #let _ns_enum = v3(namespaces.oid, "e4f747b7-fc19-4082-9acf-cd0f1b188bba")
 #let _enum_uuid(name) = v3(_ns_enum, name)
@@ -7,15 +7,11 @@
 // The `fields` method: return a dictionary of field-name -> value for a
 // record instance.
 #let _get_fields_enum(self) = {
-  let out = (:)
   let typ = self._type._variants.at(self.variant)
   if (type(typ) == type) {
-    self.payload
+    ((self.variant): self.payload)
   } else {
-    for (n, t) in typ._fields {
-      out.insert(n, self.payload.at(n))
-    }
-    out
+    ((self.variant): (self.payload.fields)())
   }
 }
 
@@ -96,12 +92,19 @@
   compare: _enum_compare,
   new: _new_enum,
   with: _with_enum,
+  // NOTE: private API, for sum type construct only, no outside usage
   _register: _register_enum,
 )
 
 #let enumerator(..variants) = {
   let _description = arguments.pos(variants).join("\n")
   let _variants = arguments.named(variants)
+
+  _check_names(
+    _variants.keys(),
+    _type_reserved_names + _enum_built-ins.keys()
+      + ("fields", "description", "variant", "payload"),
+  )
 
   // The "type" is itself just a dictionary: a UUID identifying it, the
   // declared field map, and a method registry seeded with the `fields`
@@ -136,6 +139,12 @@
 
 #let impl_enum(ty, ..fns) = {
   let fns = arguments.named(fns)
+
+  _check_names(
+    fns.keys(),
+    _type_reserved_names + _enum_built-ins.keys()
+      + ("fields", "description", "variant", "payload") + ty._variants.keys(),
+  )
 
   for (name, fn) in fns {
     assert(type(fn) == function)
