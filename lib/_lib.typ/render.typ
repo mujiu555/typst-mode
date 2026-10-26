@@ -150,7 +150,7 @@
       if pos != none and pos + 1 < ids.len() {
         nav.push(link(_destination(docs.at(ids.at(pos + 1)), entries), "[next]"))
       }
-      let tocs = query(outline).filter(it => it.target == heading)
+      let tocs = query(outline)
       if tocs.len() > 0 {
         nav.push(link(tocs.first().location(), "[toc]"))
       }
