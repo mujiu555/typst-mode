@@ -2,23 +2,15 @@
 // Document metadata system.
 //
 // `meta(...)` in art.typ declares a document: it builds a `_core_doc` record from the
-// given metadata, stamps it with a UUID-derived `did`, attaches it to any
+// given metadata, attaches it to any
 // tags, registers it in the `documents` store, and makes it the `current`
 // document. Documents are referenced by id elsewhere (e.g. by tag.typ and
 // by a future bibliography/record layer).
 
-#import "uid.typ": namespaces, v3
-#import "types.typ": author, img
+#import "types.typ": img
 #import "record.typ": record
-#import "enum.typ": enumerator
 #import "categories.typ": category
-#import "tag.typ": tag
-#import "state.typ": _mkstate, _state
-
-// UUID namespace for documents: `_doc_uuid(name)` turns a document name
-// into a deterministic v3 UUID, giving every document a stable, unique id.
-#let _ns_doc = v3(namespaces.oid, "aa6f42d8-5c10-49a9-985f-cad16abd219b")
-#let _doc_uuid(name) = v3(_ns_doc, name)
+#import "state.typ": _mkstate
 
 // Global stores (see state.typ):
 //   documents — id -> `_Core_doc` map of every declared document
@@ -58,7 +50,6 @@
   "Metadata: [Core]",
   id: str,
   parent_id: str,
-  did: str,
   file_path: str,
 
   title: content,

@@ -4,7 +4,6 @@
 // tracks the documents attached to it via its own `_state` slot.
 
 #import "record.typ": impl_record, record
-#import "util.typ": _fetch_method
 #import "state.typ": _mkstate, _state
 
 #import "uid.typ": namespaces, v3

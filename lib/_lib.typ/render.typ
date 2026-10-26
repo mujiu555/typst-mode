@@ -1,12 +1,8 @@
-#import "doc.typ": current, documents
+#import "doc.typ": current
 #import "types.typ": author
 #import "indexer.typ": backlinks, indexers, mkindex
 #import "state.typ": _mkstate
-#import "util.typ": _is_type, _match
-#import "uid.typ": namespaces, v3
-
-#let _ns_rend = v3(namespaces.oid, "4b318b06-1796-48bf-a7a5-bf07de55992f")
-#let _rend_uuid(name) = v3(_ns_rend, name)
+#import "util.typ": _match
 
 #let entities = _mkstate(
   "ac70da6c-0504-423b-b152-b40b80ffc95f",
@@ -36,9 +32,6 @@
   }
   parts
 }
-
-// Navigation does not record backlinks; only explicit lookup calls do.
-#let _destination(doc, entries) = entries.at(doc.id).loc
 
 // Render the current note and register its id as a global index label.
 #let mkheading(new-page: true) = context {
@@ -82,10 +75,7 @@
   pagebreak(weak: true)
   align(center)[
     #v(1fr)
-    #if doc.cover_image.variant == "path" {
-      image(doc.cover_image.payload.p, width: 60%)
-      v(1em)
-    } else if doc.cover_image.variant == "data" {
+    #if doc.cover_image.variant in ("path", "data") {
       image(doc.cover_image.payload.p, width: 60%)
       v(1em)
     }

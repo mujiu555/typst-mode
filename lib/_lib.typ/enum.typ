@@ -76,7 +76,6 @@
 
   let this_call(variant) = {
     let fn = (self, ..rest) => { (self.new)(variant, ..rest) }
-    assert(fn != auto)
     (..rest) => fn(_fetch_method(self, this_call, self._variants.keys()), ..rest)
   }
   self + _fetch_method(self, this_call, self._variants.keys())
@@ -102,8 +101,7 @@
 
   _check_names(
     _variants.keys(),
-    _type_reserved_names + _enum_built-ins.keys()
-      + ("fields", "description", "variant", "payload"),
+    _type_reserved_names + _enum_built-ins.keys() + ("fields", "description", "variant", "payload"),
   )
 
   // The "type" is itself just a dictionary: a UUID identifying it, the
@@ -142,8 +140,10 @@
 
   _check_names(
     fns.keys(),
-    _type_reserved_names + _enum_built-ins.keys()
-      + ("fields", "description", "variant", "payload") + ty._variants.keys(),
+    _type_reserved_names
+      + _enum_built-ins.keys()
+      + ("fields", "description", "variant", "payload")
+      + ty._variants.keys(),
   )
 
   for (name, fn) in fns {

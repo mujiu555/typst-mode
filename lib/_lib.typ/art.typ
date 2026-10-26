@@ -1,4 +1,4 @@
-#import "doc.typ": _core_doc, _doc_uuid, current, documents
+#import "doc.typ": _core_doc, current, documents
 #import "types.typ": author, img
 #import "categories.typ": category
 #import "util.typ": _match
@@ -30,7 +30,6 @@
     let doc = (_core_doc.new)(
       id: id,
       parent_id: parent_id,
-      did: _doc_uuid(id),
       file_path: file_path,
 
       title: title,

@@ -1,6 +1,6 @@
 
 #import "record.typ": record
-#import "enum.typ": enumerator, impl_enum
+#import "enum.typ": enumerator
 
 #let author = record(
   name: str,
