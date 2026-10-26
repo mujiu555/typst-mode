@@ -1,7 +1,17 @@
 #import "doc.typ": current, documents
 #import "types.typ": author
 #import "indexer.typ": backlinks, indexers, mkindex
+#import "state.typ": _mkstate
 #import "util.typ": _is_type, _match
+#import "uid.typ": namespaces, v3
+
+#let _ns_rend = v3(namespaces.oid, "4b318b06-1796-48bf-a7a5-bf07de55992f")
+#let _rend_uuid(name) = v3(_ns_rend, name)
+
+#let entities = _mkstate(
+  "ac70da6c-0504-423b-b152-b40b80ffc95f",
+  (:),
+)
 
 #let _meta-color = rgb("#999")
 #let _taxon-color = rgb("#555")
@@ -28,12 +38,14 @@
 }
 
 // Navigation does not record backlinks; only explicit lookup calls do.
-// Documents without a rendered heading remain valid navigation targets.
-#let _destination(doc, entries) = entries.at(doc.id, default: (loc: doc.loc)).loc
+#let _destination(doc, entries) = entries.at(doc.id).loc
 
 // Render the current note and register its id as a global index label.
 #let mkheading(new-page: true) = context {
   let doc = (current.get)()
+  (entities.update)(dc => {
+    dc + ((doc.id): doc)
+  })
   assert("id" in doc, message: "Call meta before mkheading")
   if new-page { pagebreak(weak: true) }
   if doc.tags.len() > 0 {
@@ -53,7 +65,7 @@
     text(weight: 600, doc.title) + h(0.5em) + link(doc.file_path, _slug("[" + doc.id + "]")),
   )))
   let parts = _details(doc)
-  let parent = (documents.final)().at(doc.parent_id, default: none)
+  let parent = (entities.final)().at(doc.parent_id, default: none)
   if parent != none and parent.id != doc.id {
     parts.push(link(_destination(parent, indexers()), "[back]"))
   }
@@ -123,7 +135,7 @@
   set page(paper: "a4", margin: 2em, header: context {
     let doc = (current.get)()
     if "id" in doc {
-      let docs = (documents.final)()
+      let docs = (entities.final)()
       let entries = indexers()
       let ids = docs.keys()
       let pos = ids.position(id => id == doc.id)

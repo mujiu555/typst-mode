@@ -60,6 +60,7 @@
 //   taga,
 //   tagb
 // ) = (tag.register)(
+//   "namespaces",
 //   "taga",
 //   "tagb"
 // )

@@ -80,7 +80,5 @@
   tags: array,
 
   tlb: dictionary,
-
-  loc: location,
 )
 

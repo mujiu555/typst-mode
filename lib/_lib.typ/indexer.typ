@@ -65,7 +65,7 @@
   // remove the state update and oscillate between layout passes.
   context {
     let matches = query(<typst-mode-index-label>).filter(m => m.value == label)
-    assert(matches.len() == 1, message: "ERROR: duplicate label: `" + label + "`")
+    assert(matches.len() <= 1, message: "ERROR: duplicate label: `" + label + "`")
   }
 }
 

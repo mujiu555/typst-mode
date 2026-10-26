@@ -52,8 +52,6 @@
       tags: tags,
 
       tlb: tlb,
-
-      loc: here(),
     )
     // Attach the document to every tag it lists
     for t in tags {
@@ -79,6 +77,6 @@
   }
   context {
     let matches = query(<typst-mode-document-id>).filter(m => m.value == id)
-    assert(matches.len() == 1, message: "ERROR: duplicate document id: `" + id + "`")
+    assert(matches.len() <= 1, message: "ERROR: duplicate document id: `" + id + "`")
   }
 }

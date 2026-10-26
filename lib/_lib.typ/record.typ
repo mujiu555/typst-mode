@@ -148,13 +148,13 @@
 ///
 /// ```typst
 /// #let Adder = record(
-///   x: Int,
+///   x: int,
 /// )
 /// ```
 ///
 /// You can compare types by:
 /// ```typst
-/// #Adder.compare(Another-Type)
+/// #(Adder.compare)(Another-Type)
 /// ```
 ///
 /// *Returns:*
