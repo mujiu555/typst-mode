@@ -41,7 +41,7 @@
   // Register outside the heading body: outlines replay that body.
   mkindex(doc.id, block(below: 0.3em, heading(
     depth: 1,
-    text(weight: 600, doc.title) + h(0.5em) + _slug("[" + doc.id + "]"),
+    text(weight: 600, doc.title) + h(0.5em) + link(doc.file_path, _slug("[" + doc.id + "]")),
   )))
   let parts = _details(doc)
   let parent = (documents.final)().at(doc.parent_id, default: none)

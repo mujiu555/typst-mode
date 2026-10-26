@@ -59,6 +59,7 @@
   id: str,
   parent_id: str,
   did: str,
+  file_path: str,
 
   title: content,
   authors: array, // content/string names or author records; always an array

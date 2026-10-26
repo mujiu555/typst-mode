@@ -6,6 +6,7 @@
 #let meta(
   id: none,
   parent_id: "index",
+  file_path: "(no link (uri))",
   //
   title: none,
   authors: none,
@@ -29,6 +30,7 @@
       id: id,
       parent_id: parent_id,
       did: _doc_uuid(id),
+      file_path: file_path,
 
       title: title,
       authors: authors,
