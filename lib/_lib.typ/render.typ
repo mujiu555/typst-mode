@@ -150,6 +150,10 @@
       if pos != none and pos + 1 < ids.len() {
         nav.push(link(_destination(docs.at(ids.at(pos + 1)), entries), "[next]"))
       }
+      let tocs = query(outline).filter(it => it.target == heading)
+      if tocs.len() > 0 {
+        nav.push(link(tocs.first().location(), "[toc]"))
+      }
       let parts = (doc.title,)
       if doc.tags.len() > 0 { parts.push(doc.tags.map(t => t.name).join(", ")) }
       parts.push(doc.date.display("[year]-[month]-[day]"))
