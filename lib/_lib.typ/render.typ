@@ -1,5 +1,7 @@
 #import "doc.typ": current, documents
+#import "types.typ": author
 #import "indexer.typ": backlinks, indexers, mkindex
+#import "util.typ": _is_type, _match
 
 #let _meta-color = rgb("#999")
 #let _taxon-color = rgb("#555")
@@ -10,7 +12,7 @@
   doc
     .authors
     .map(a => {
-      if type(a) == dictionary { a.name } else { a }
+      if _match(author, a) { link(a.home, a.name) } else if _match(str, a) { a }
     })
     .join(", ")
 )
@@ -34,9 +36,16 @@
   let doc = (current.get)()
   assert("id" in doc, message: "Call meta before mkheading")
   if new-page { pagebreak(weak: true) }
-  let taxon = if type(doc.tlb) == dictionary { doc.tlb.at("taxon", default: none) }
-  if taxon != none and taxon != "" {
-    block(above: 0.8em, text(weight: 600, fill: _taxon-color, upper(taxon.at(0)) + taxon.slice(1) + "."))
+  if doc.tags.len() > 0 {
+    let names = doc.tags.map(v => {
+      let chars = v.name.clusters()
+      if chars.len() == 0 { return "" }
+      upper(chars.first()) + chars.slice(1).join() + "."
+    })
+    block(
+      above: 0.8em,
+      text(weight: 600, fill: _taxon-color, names.join(" - ")),
+    )
   }
   // Register outside the heading body: outlines replay that body.
   mkindex(doc.id, block(below: 0.3em, heading(
@@ -55,7 +64,6 @@
 }
 
 // A separate cover does not register the heading label a second time.
-// users must make sure that document/book authors are strings rather than contents that may provided for mkheading
 #let mkcover() = context {
   let doc = (current.get)()
   assert("id" in doc, message: "Call meta before mkcover")
@@ -65,8 +73,7 @@
     #if doc.cover_image.variant == "path" {
       image(doc.cover_image.payload.p, width: 60%)
       v(1em)
-    }
-    #if doc.cover_image.variant == "data" {
+    } else if doc.cover_image.variant == "data" {
       image(doc.cover_image.payload.p, width: 60%)
       v(1em)
     }
@@ -78,7 +85,11 @@
 
     #set document(
       title: doc.title,
-      author: doc.authors,
+      author: doc.authors.map(v => if type(v) == str {
+        v
+      } else {
+        v.name
+      }),
       date: doc.date,
       description: doc.description,
       keywords: doc.keywords,

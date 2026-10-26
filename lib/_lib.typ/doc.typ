@@ -62,7 +62,7 @@
   file_path: str,
 
   title: content,
-  authors: array, // content/string names or author records; always an array
+  authors: array, // string names or author records; always an array
 
   date: datetime,
   lang: str,

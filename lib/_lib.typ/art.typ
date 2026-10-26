@@ -1,6 +1,7 @@
 #import "doc.typ": _core_doc, _doc_uuid, current, documents
-#import "types.typ": img
+#import "types.typ": author, img
 #import "categories.typ": category
+#import "util.typ": _match
 
 // Declare a document. Most arguments map 1:1 onto `_Core_doc` fields and
 #let meta(
@@ -57,6 +58,13 @@
     // Attach the document to every tag it lists
     for t in tags {
       (t.add-doc)(doc)
+    }
+
+    for v in authors {
+      assert(
+        _match(str, v) or _match(author, v),
+        message: "authors must contain strings or author records",
+      )
     }
 
     // Register under its id, and make it the current document

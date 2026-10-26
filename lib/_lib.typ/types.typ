@@ -8,6 +8,7 @@
   name: str,
   affiliation: str,
   email: str,
+  home: str,
   orcid: str,
 )
 
