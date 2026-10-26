@@ -10,7 +10,7 @@
 
 #let entities = _mkstate(
   "ac70da6c-0504-423b-b152-b40b80ffc95f",
-  (:),
+  (),
 )
 
 #let _meta-color = rgb("#999")
@@ -44,7 +44,7 @@
 #let mkheading(new-page: true) = context {
   let doc = (current.get)()
   (entities.update)(dc => {
-    dc + ((doc.id): doc)
+    dc + (doc.id,)
   })
   assert("id" in doc, message: "Call meta before mkheading")
   if new-page { pagebreak(weak: true) }
@@ -65,9 +65,9 @@
     text(weight: 600, doc.title) + h(0.5em) + link(doc.file_path, _slug("[" + doc.id + "]")),
   )))
   let parts = _details(doc)
-  let parent = (entities.final)().at(doc.parent_id, default: none)
-  if parent != none and parent.id != doc.id {
-    parts.push(link(_destination(parent, indexers()), "[back]"))
+  let parent-id = doc.parent_id
+  if parent-id != doc.id and parent-id in (entities.final)() {
+    parts.push(link(indexers().at(parent-id).loc, "[back]"))
   }
   block(above: 0.3em, below: 0.6em, text(size: 0.9em, fill: _meta-color, parts.join(" · ")))
   if doc.abstract != "" {
@@ -135,27 +135,28 @@
   set page(paper: "a4", margin: 2em, header: context {
     let doc = (current.get)()
     if "id" in doc {
-      let docs = (entities.final)()
       let entries = indexers()
-      let ids = docs.keys()
+      let ids = (entities.final)()
       let pos = ids.position(id => id == doc.id)
       let nav = ()
       if pos != none and pos > 0 {
-        nav.push(link(_destination(docs.at(ids.at(pos - 1)), entries), "[prev]"))
+        nav.push(link(entries.at(ids.at(pos - 1)).loc, "[prev]"))
       }
-      let parent = docs.at(doc.parent_id, default: none)
-      if parent != none and parent.id != doc.id {
-        nav.push(link(_destination(parent, entries), "[up]"))
+      // Parent: only documents registered by mkheading
+      if doc.parent_id != doc.id and doc.parent_id in ids {
+        nav.push(link(entries.at(doc.parent_id).loc, "[up]"))
       }
       if pos != none and pos + 1 < ids.len() {
-        nav.push(link(_destination(docs.at(ids.at(pos + 1)), entries), "[next]"))
+        nav.push(link(entries.at(ids.at(pos + 1)).loc, "[next]"))
       }
       let tocs = query(outline)
       if tocs.len() > 0 {
         nav.push(link(tocs.first().location(), "[toc]"))
       }
       let parts = (doc.title,)
-      if doc.tags.len() > 0 { parts.push(doc.tags.map(t => t.name).join(", ")) }
+      if doc.tags.len() > 0 {
+        parts.push(doc.tags.map(t => t.name).join(", "))
+      }
       parts.push(doc.date.display("[year]-[month]-[day]"))
       text(size: 0.75em, fill: _meta-color, grid(
         columns: (auto, 1fr),

@@ -36,15 +36,14 @@
       _parent: self.id,
       id: id,
       name: name,
-      documents: _mkstate(id, (:)),
+      documents: _mkstate(id, ()),
     )
   },
   // Attach a document by id. Functional updates accumulate documents without
   // depending on a contextual read from a previous layout pass.
   add-doc: (self, doc) => {
     (self.documents.update)(cur => {
-      cur.insert(doc.id, doc)
-      cur
+      cur + (doc.id,)
     })
   },
   get-doc: self => {
@@ -74,7 +73,7 @@
           _parent: "",
           id: root_id,
           name: "root",
-          documents: _mkstate(root_id + ":" + "f8480bdb-6c76-44b5-a0a3-211e55105521", (:)),
+          documents: _mkstate(root_id + ":" + "f8480bdb-6c76-44b5-a0a3-211e55105521", ()),
         )
         (root,) + arguments.pos(tags).map(name => (root.sub)(name))
       },
