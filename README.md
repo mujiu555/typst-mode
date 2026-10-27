@@ -39,11 +39,15 @@ Root: /                         ; Project root
 
 ## Usage
 
+```
+#import "@preview/tysty"
+```
+
 ## Plans
 
-## Related Efforts
+- [ ] reimplement uid, make it a correct uuid, remove `digestify` dependency
 
-1. [Typsy](https://github.com/patrick-kidger/typsy)
+## Related Efforts
 
 ## Maintainers
 

@@ -1,12 +1,12 @@
 [package]
-name = ""
+name = "tysty"
 version = "0.1.0"
 entrypoint = "lib/_lib.typ/lib.typ"
-authors = ["GitHub@mujiu555"]
+authors = ["mujiu555 <@mujiu555>"]
 license = "Apache-2.0"
-description = ""
-homepage = "https://github.com/mujiu555/typst-mode"
-repository = "https://github.com/mujiu555/typst-mode"
+description = "Organize your notes, knowledge, work, and life in Typst."
+homepage = "https://github.com/mujiu555/tysty"
+repository = "https://github.com/mujiu555/tysty"
 keywords = ["enhancement"]
 
 [tool]
