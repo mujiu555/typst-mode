@@ -1,6 +1,3 @@
-// FILE FIXTURE: run in an external staging copy with tests/fixtures/background.png
-// decoded from tests/fixtures/png.typ. The manual batch under /tmp prepares this;
-// no PNG or script is written inside the project.
 #import "/tests/fixtures/rendered_text.typ": observe-text, rendered-text
 #show text: observe-text
 // Manual: typst compile --root . tests/types/img_data_read_png.typ /tmp/img-data-read.pdf

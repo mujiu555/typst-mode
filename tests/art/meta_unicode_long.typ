@@ -2,8 +2,8 @@
 // Expected: successful compilation and all assertions pass.
 #import "/lib/_lib.typ/lib.typ": *
 #let long = "x" * 2048
-#meta(id: "笔记/α 🚀", title: [*Rich* title], authors: ([Alice], (name: "Bob")), abstract: long, description: long, keywords: ("重复", "重复", ""), tlb: (taxon: "", custom: (nested: true)))
-#mkheading(new-page: false)
+#meta(id: "笔记/α 🚀", title: [*Rich* title], authors: ("Alice", (author.new)(name: "Bob", affiliation: "", email: "", home: "https://example.org", orcid: "")), abstract: long, description: long, keywords: ("重复", "重复", ""), tlb: (taxon: "", custom: (nested: true)))
+#mkdoc(new-page: false)[]
 #context {
  let d = (current.get)()
  assert.eq(d.id, "笔记/α 🚀")

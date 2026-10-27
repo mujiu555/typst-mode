@@ -12,5 +12,5 @@
  (category.blogPost)(site: "S", series: "X"), category.null,
 )
 #assert.eq(values.map(v => v.variant), ("journal", "conference", "book", "bookChapter", "thesis", "report", "preprint", "blogPost", "null"))
-#assert.eq((values.first().fields)(), (journal: "J", volume: 1, issue: 2, pages: "1-5"))
-#assert.eq((category.null.fields)(), (:))
+#assert.eq((values.first().fields)(), (journal: (journal: "J", volume: 1, issue: 2, pages: "1-5")))
+#assert.eq((category.null.fields)(), (null: (:)))

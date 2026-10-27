@@ -11,4 +11,5 @@
 #let C = record(f: F)
 #let v = (C.new)(f: (F.new)(n: (I.new)(i: 10)))
 
-#(v.fields)()
+#assert.eq((v.fields)(), (f: (n: (i: 10))))
+#assert.eq((value.fields)(), (child: (x: 2), choice: (point: (x: 3))))

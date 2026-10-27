@@ -1,3 +1,4 @@
+// expect-error: conflicts with a reserved name
 // Manual: typst compile --root . tests/reject/enum/reserved_name.typ /tmp/name-validation.pdf
 // Rejection cases also accept --input name=NAME; inspect the named diagnostic.
 #import "/lib/_lib.typ/enum.typ": enumerator

@@ -3,5 +3,5 @@
 #import "/lib/_lib.typ/record.typ": record, impl_record
 #import "/lib/_lib.typ/enum.typ": enumerator, impl_enum
 #let E = enumerator(number: int, point: record(x: int))
-#assert.eq((((E.number)(3)).fields)(), 3)
-#assert.eq((((E.point)(x: 7)).fields)(), (x: 7))
+#assert.eq((((E.number)(3)).fields)(), (number: 3))
+#assert.eq((((E.point)(x: 7)).fields)(), (point: (x: 7)))

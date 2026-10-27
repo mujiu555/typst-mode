@@ -7,4 +7,4 @@
 #assert.eq(n.variant, "number")
 #assert.eq(n.payload, 5)
 #assert.eq((E.point)(x: 9).payload.x, 9)
-#assert.eq(((E.empty)().fields)(), (:))
+#assert.eq(((E.empty)().fields)(), (empty: (:)))

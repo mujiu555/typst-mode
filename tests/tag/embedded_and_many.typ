@@ -1,7 +1,8 @@
 // Manual: typst compile --root . tests/tag/embedded_and_many.typ /tmp/typst-expanded-test.pdf
 // Expected: successful compilation and all assertions pass.
 #import "/lib/_lib.typ/lib.typ": *
-#let (root, shared, child-tag) = (tag.register)("shared", "child")
+#let tree = (tag.register)("many", (shared: (:), child: (:)))
+#let (root, shared, child-tag) = (tree.tag, tree.children.shared.tag, tree.children.child.tag)
 #meta(id: "parent", title: [Parent], authors: (), tags: (shared,))
 #for i in range(20) {
  embed([#meta(id: "child-" + str(i), title: [Child], authors: (), tags: (shared, shared, child-tag))])

@@ -13,6 +13,6 @@
  assert.eq(d.cover_image.variant, "null")
  assert.eq((documents.final)().keys(), ("",))
 }
-#mkheading(new-page: false)
+#mkdoc(new-page: false)[]
 #mkcover()
 #context assert.eq((current.get)().title, [])

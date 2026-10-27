@@ -1,3 +1,4 @@
+// expect-error: not exist
 // Manual: typst compile --root . tests/reject/record/new_none.typ /tmp/typst-test.pdf
 // Expected rejection: current record contract requires enums for null alternatives.
 #import "/lib/_lib.typ/record.typ": record

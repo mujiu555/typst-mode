@@ -1,6 +1,5 @@
 // Function test: regressions/record/update_auto
 // Manual: typst compile --root . tests/regressions/record/update_auto.typ /tmp/typst-unit-test.pdf
-// Regression: asserts intended behavior; currently fails in the library.
 #import "/lib/_lib.typ/record.typ": record, impl_record
 #let R = record(x: type(auto))
 #let r = (R.new)(x: auto)

@@ -5,7 +5,7 @@
 #let data = (img.data)(p: png)
 #assert.eq(data.variant, "data")
 #assert.eq(data.payload.p, png)
-#assert.eq((img.null.fields)(), (:))
+#assert.eq((img.null.fields)(), (null: (:)))
 #image(data.payload.p)
 #meta(id: "no-image", title: [No image], authors: (), cover_image: img.null)
 #mkcover()

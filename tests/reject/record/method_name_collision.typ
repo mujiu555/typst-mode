@@ -1,3 +1,4 @@
+// expect-error: conflicts with a reserved name
 // Manual: typst compile --root . tests/reject/record/method_name_collision.typ /tmp/name-validation.pdf
 // Rejection cases also accept --input name=NAME; inspect the named diagnostic.
 #import "/lib/_lib.typ/record.typ": record, impl_record

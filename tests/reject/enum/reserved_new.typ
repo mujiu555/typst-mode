@@ -1,3 +1,4 @@
+// expect-error: conflicts with a reserved name
 // Manual: typst compile --root . tests/reject/enum/reserved_new.typ /tmp/typst-test.pdf
 // Expected rejection at the declaration, before the sentinel assertion.
 #import "/lib/_lib.typ/enum.typ": enumerator

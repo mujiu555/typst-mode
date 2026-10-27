@@ -8,5 +8,5 @@
  assert.eq(query(<template-body>).len(), 1)
  assert.eq(page.width, 210mm)
  assert.eq(page.height, 297mm)
- assert.eq(page.margin, 2em)
+ assert.eq(page.margin, (left: 2em, right: 2em, top: 4em, bottom: 3em))
 }

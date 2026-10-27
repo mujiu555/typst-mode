@@ -4,10 +4,11 @@
 // Expected: successful compilation and all assertions pass.
 #import "/lib/_lib.typ/lib.typ": *
 #import "/tests/fixtures/png.typ": png
-#import "/lib/_lib.typ/doc.typ": _doc_uuid
-#let (root, topic) = (tag.register)("topic")
+#let tree = (tag.register)("test", (topic: (:),))
+#let (root, topic) = (tree.tag, tree.children.topic.tag)
 #let expected = (id: "all-fields",
-parent_id: "parent",
+parent_id: "all-fields",
+file_path: "https://example.org/all-fields",
 title: [Complete metadata],
 authors: ("Alice", "Bob"),
 date: datetime(year: 2024, month: 2, day: 29),
@@ -26,15 +27,13 @@ tlb: (taxon: "note", extra: "custom"))
 #context {
  let d = (current.get)()
  for (name, value) in expected { assert.eq(d.at(name), value, message: "meta must preserve " + name) }
- assert.eq(d.did, _doc_uuid(expected.id))
- assert.eq(type(d.loc), location)
- assert.eq((d.fields)().keys().len(), expected.len() + 2)
- assert.eq((documents.final)().at(expected.id).did, d.did)
- assert.eq((topic.get-doc)().keys(), (expected.id,))
+ assert.eq((d.fields)().keys().len(), expected.len())
+ assert.eq(((documents.final)().at(expected.id).fields)(), (d.fields)())
+ assert.eq((topic.get-doc)().map(d => d.id), (expected.id,))
 }
 
 #mkcover()
-#mkheading(new-page: false)
+#mkdoc(new-page: false)[]
 #context {
  assert.eq(rendered-text().matches(regex("Complete metadata")).len(), 2, message: "One cover title and one heading")
  assert.eq(query(heading).len(), 1)
