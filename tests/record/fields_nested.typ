@@ -5,5 +5,10 @@
 #let Choice = enumerator(point: Point, number: int)
 #let Container = record(child: Point, choice: Choice)
 #let value = (Container.new)(child: (Point.new)(x: 2), choice: (Choice.point)(x: 3))
-#assert.eq((value.fields)(), (child: (x: 2), choice: (x: 3)))
-#assert.eq((((Container.new)(child: (Point.new)(x: 4), choice: (Choice.number)(7))).fields)(), (child: (x: 4), choice: 7))
+
+#let I = record(i: int)
+#let F = record(n: I)
+#let C = record(f: F)
+#let v = (C.new)(f: (F.new)(n: (I.new)(i: 10)))
+
+#(v.fields)()

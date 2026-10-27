@@ -7,9 +7,8 @@
 // document. Documents are referenced by id elsewhere (e.g. by tag.typ and
 // by a future bibliography/record layer).
 
-#import "types.typ": img
+#import "types.typ": category, img
 #import "record.typ": record
-#import "categories.typ": category
 #import "state.typ": _mkstate
 
 // Global stores (see state.typ):

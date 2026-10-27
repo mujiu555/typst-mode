@@ -1,6 +1,5 @@
 #import "doc.typ": _core_doc, current, documents
-#import "types.typ": author, img
-#import "categories.typ": category
+#import "types.typ": author, category, img
 #import "util.typ": _match
 
 // Declare a document. Most arguments map 1:1 onto `_Core_doc` fields and
@@ -52,10 +51,6 @@
 
       tlb: tlb,
     )
-    // Attach the document to every tag it lists
-    for t in tags {
-      (t.add-doc)(doc)
-    }
 
     for v in authors {
       assert(
