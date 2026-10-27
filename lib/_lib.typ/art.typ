@@ -1,5 +1,6 @@
 #import "doc.typ": _core_doc, current, documents
 #import "types.typ": author, category, img
+#import "tag.typ": tag
 #import "util.typ": _match
 
 #let _validate-parent(docs, id) = {
@@ -79,6 +80,18 @@
       assert(
         _match(str, v) or _match(author, v),
         message: "authors must contain strings or author records",
+      )
+    }
+    for t in tags {
+      assert(
+        _match(tag, t),
+        message: "tags must contain tag records",
+      )
+    }
+    for keyword in keywords {
+      assert(
+        type(keyword) == str,
+        message: "keywords must contain strings",
       )
     }
 

@@ -1,4 +1,4 @@
-#import "doc.typ": current
+#import "doc.typ": current, documents
 #import "types.typ": author
 #import "indexer.typ": backlinks, indexers, mkindex
 #import "state.typ": _mkstate
@@ -10,6 +10,7 @@
 )
 
 #let _meta-color = rgb("#999")
+#let _nav-color = rgb("#555")
 #let _taxon-color = rgb("#555")
 
 #let _slug(body) = text(size: 0.9em, fill: rgb("#888"), underline(stroke: (thickness: 0.5pt, dash: ("dot", 1pt)), body))
@@ -22,6 +23,28 @@
     })
     .join(", ")
 )
+#let _content-to-text(body) = {
+  if type(body) == str {
+    return body
+  }
+  if body.has("text") {
+    return body.text
+  }
+  if body.has("children") {
+    return body.children.map(_content-to-text).join("")
+  }
+  ""
+}
+
+#let _truncate-middle(body, max: 20) = {
+  let chars = _content-to-text(body).clusters()
+  if chars.len() <= max {
+    return body
+  }
+  let left = calc.ceil((max - 1) / 2)
+  let right = max - 1 - left
+  chars.slice(0, left).join() + "…" + chars.slice(chars.len() - right).join()
+}
 
 #let _details(doc) = {
   let parts = ()
@@ -41,17 +64,6 @@
   })
   assert("id" in doc, message: "Call meta before mkheading")
   if new-page { pagebreak(weak: true) }
-  if doc.tags.len() > 0 {
-    let names = doc.tags.map(v => {
-      let chars = v.name.clusters()
-      if chars.len() == 0 { return "" }
-      upper(chars.first()) + chars.slice(1).join() + "."
-    })
-    block(
-      above: 0.8em,
-      text(weight: 600, fill: _taxon-color, names.join(" - ")),
-    )
-  }
   // Register outside the heading body: outlines replay that body.
   mkindex(doc.id, block(below: 0.3em, heading(
     depth: 1,
@@ -101,59 +113,68 @@
   pagebreak(weak: true)
 }
 
-// mkindex declares a target; render-index renders the collected list.
-#let render-index(title: [Index], show-backlinks: true) = context {
-  heading(outlined: false, title)
-  for (name, entry) in indexers() {
-    block[
-      #link(entry.loc, entry.label)
-      #if show-backlinks {
-        let refs = backlinks(name)
-        if refs.len() > 0 {
-          text(size: 0.8em, fill: _meta-color, [
-            #h(0.5em)Referenced from:
-            #refs.enumerate().map(((i, r)) => link(r.loc, str(i + 1))).join(", ")
-          ])
-        }
-      }
-    ]
-  }
-}
-
 // Wishful-Thinking's note layout with tag names and the new global index.
 #let template(body) = {
-  set page(paper: "a4", margin: 2em, header: context {
-    let doc = (current.get)()
-    if "id" in doc {
-      let entries = indexers()
-      let ids = (entities.final)()
-      let pos = ids.position(id => id == doc.id)
-      let nav = ()
-      if pos != none and pos > 0 {
-        nav.push(link(entries.at(ids.at(pos - 1)).loc, "[prev]"))
+  set page(
+    paper: "a4",
+    margin: (
+      x: 2em,
+      top: 4em,
+      bottom: 3em,
+    ),
+    header: context {
+      let doc = (current.get)()
+      if "id" in doc {
+        let entries = indexers()
+        let ids = (entities.final)()
+        let pos = ids.position(id => id == doc.id)
+
+        let nav = ()
+        let tocs = query(outline)
+        if tocs.len() > 0 {
+          nav.push(link(tocs.first().location(), "[toc]"))
+        }
+        if pos != none and pos > 0 {
+          nav.push(link(entries.at(ids.at(pos - 1)).loc, "[prev]"))
+        }
+        if pos != none and pos + 1 < ids.len() {
+          nav.push(link(entries.at(ids.at(pos + 1)).loc, "[next]"))
+        }
+
+        let parts = (doc.title, doc.date.display("[year]-[month]-[day]"))
+
+        let breadcrumbs = ()
+        let id = doc.id
+        let docs = (documents.final)()
+        while true {
+          let node = docs.at(id)
+          let title = _truncate-middle(node.title)
+          let item = if id in entries {
+            link(entries.at(id).loc, title)
+          } else {
+            title
+          }
+          breadcrumbs.insert(0, item)
+          if node.parent_id == id {
+            break
+          }
+          id = node.parent_id
+        }
+
+        grid(
+          columns: (auto, 1fr),
+          gutter: 1em,
+          row-gutter: 4pt,
+          text(size: 9pt, fill: _nav-color, align(left, nav.join(" "))),
+          text(size: 9pt, fill: _meta-color, align(right, parts.join(" · "))),
+
+          grid.cell(
+            colspan: 2,
+            text(size: 7pt, fill: _meta-color, breadcrumbs.join(" > ")),
+          ),
+        )
       }
-      // Parent: only documents registered by mkheading
-      if doc.parent_id != doc.id and doc.parent_id in ids {
-        nav.push(link(entries.at(doc.parent_id).loc, "[up]"))
-      }
-      if pos != none and pos + 1 < ids.len() {
-        nav.push(link(entries.at(ids.at(pos + 1)).loc, "[next]"))
-      }
-      let tocs = query(outline)
-      if tocs.len() > 0 {
-        nav.push(link(tocs.first().location(), "[toc]"))
-      }
-      let parts = (doc.title,)
-      if doc.tags.len() > 0 {
-        parts.push(doc.tags.map(t => t.name).join(", "))
-      }
-      parts.push(doc.date.display("[year]-[month]-[day]"))
-      text(size: 0.75em, fill: _meta-color, grid(
-        columns: (auto, 1fr),
-        gutter: 1em,
-        align(left, nav.join(" ")), align(right, parts.join(" · ")),
-      ))
-    }
-  })
+    },
+  )
   body
 }
