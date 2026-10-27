@@ -113,32 +113,65 @@
   pagebreak(weak: true)
 }
 
+// Shared outline row, using the destination's page counter and numbering.
+#let _document-row(doc, loc) = {
+  let page-format = loc.page-numbering()
+  let page-label = numbering(
+    if page-format == none { "1" } else { page-format },
+    ..counter(page).at(loc),
+  )
+  block(width: 100%, link(loc,
+    doc.title + h(0.5em)
+      + box(width: 1fr, repeat[.])
+      + h(0.5em) + page-label,
+  ))
+}
+
 #let render-children(
   title,
 ) = context {
   let doc = (current.get)()
   let docs = (documents.final)()
   let entries = indexers()
+  let ids = (entities.final)()
 
   let children = docs
     .values()
     .filter(
-      d => d.parent_id == doc.id and d.id != doc.id,
+      d => d.parent_id == doc.id and d.id != doc.id
+        and d.id in ids and d.id in entries,
     )
 
   if children.len() > 0 {
     heading(level: 2, outlined: false, title)
 
     for child in children {
-      if child.id in entries {
-        list.item(
-          link(entries.at(child.id).loc, child.title),
-        )
-      } else {
-        list.item(child.title)
-      }
+      _document-row(child, entries.at(child.id).loc)
     }
   }
+}
+
+// Render a tree returned by tag.register, including its root. Each tag owns
+// only its immediate child tags and documents explicitly declaring that tag.
+// Read final metadata so this list can also precede the document headings.
+#let render-tags(tree) = context {
+  let entries = indexers()
+  let ids = (entities.final)()
+  let docs = (documents.final)().values().filter(doc => doc.id in ids and doc.id in entries)
+
+  let render-node(node) = {
+    let items = node.children.values().map(child => render-node(child))
+    for doc in docs.filter(doc => doc.tags.any(tag => tag.id == node.tag.id)) {
+      items.push(list.item(_document-row(doc, entries.at(doc.id).loc)))
+    }
+    list.item(strong(node.tag.name) + if items.len() > 0 {
+      list(..items)
+    } else {
+      []
+    })
+  }
+
+  list(render-node(tree))
 }
 
 // Wishful-Thinking's note layout with tag names and the new global index.
