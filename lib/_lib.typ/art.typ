@@ -2,10 +2,33 @@
 #import "types.typ": author, category, img
 #import "util.typ": _match
 
+#let _validate-parent(docs, id) = {
+  let visited = ()
+  let current = id
+
+  while true {
+    assert(
+      current in docs,
+      message: "Unresolved document: " + current,
+    )
+    assert(
+      current not in visited,
+      message: "Cyclic parent relationship: " + repr(visited + (current,)),
+    )
+
+    visited.push(current)
+    let parent = docs.at(current).parent_id
+    if parent == current {
+      break
+    }
+    current = parent
+  }
+}
+
 // Declare a document. Most arguments map 1:1 onto `_Core_doc` fields and
 #let meta(
   id: none,
-  parent_id: "index",
+  parent_id: auto,
   file_path: "(no link (uri))",
   //
   title: none,
@@ -28,7 +51,7 @@
   context {
     let doc = (_core_doc.new)(
       id: id,
-      parent_id: parent_id,
+      parent_id: if parent_id == auto { id } else { parent_id },
       file_path: file_path,
 
       title: title,
@@ -67,10 +90,15 @@
     (current.update)(
       doc,
     )
+
     [#metadata(id) <typst-mode-document-id>]
   }
   context {
     let matches = query(<typst-mode-document-id>).filter(m => m.value == id)
     assert(matches.len() <= 1, message: "ERROR: duplicate document id: `" + id + "`")
+  }
+  context {
+    let docs = (documents.final)()
+    _validate-parent(docs, id)
   }
 }
