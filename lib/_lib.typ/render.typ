@@ -113,6 +113,34 @@
   pagebreak(weak: true)
 }
 
+#let render-children(
+  title,
+) = context {
+  let doc = (current.get)()
+  let docs = (documents.final)()
+  let entries = indexers()
+
+  let children = docs
+    .values()
+    .filter(
+      d => d.parent_id == doc.id and d.id != doc.id,
+    )
+
+  if children.len() > 0 {
+    heading(level: 2, outlined: false, title)
+
+    for child in children {
+      if child.id in entries {
+        list.item(
+          link(entries.at(child.id).loc, child.title),
+        )
+      } else {
+        list.item(child.title)
+      }
+    }
+  }
+}
+
 // Wishful-Thinking's note layout with tag names and the new global index.
 #let template(body) = {
   set page(
