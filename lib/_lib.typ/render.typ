@@ -57,7 +57,7 @@
 }
 
 // Render the current note and register its id as a global index label.
-#let mkheading(new-page: true) = context {
+#let mkdoc(new-page: true, content) = context {
   let doc = (current.get)()
   (entities.update)(dc => {
     dc + (doc.id,)
@@ -78,6 +78,7 @@
   if doc.abstract != "" {
     block(above: 0.6em, below: 1em, doc.abstract)
   }
+  content
 }
 
 // A separate cover does not register the heading label a second time.
@@ -120,11 +121,7 @@
     if page-format == none { "1" } else { page-format },
     ..counter(page).at(loc),
   )
-  block(width: 100%, link(loc,
-    doc.title + h(0.5em)
-      + box(width: 1fr, repeat[.])
-      + h(0.5em) + page-label,
-  ))
+  block(width: 100%, link(loc, doc.title + h(0.5em) + box(width: 1fr, repeat[.]) + h(0.5em) + page-label))
 }
 
 #let render-children(
@@ -138,8 +135,7 @@
   let children = docs
     .values()
     .filter(
-      d => d.parent_id == doc.id and d.id != doc.id
-        and d.id in ids and d.id in entries,
+      d => d.parent_id == doc.id and d.id != doc.id and d.id in ids and d.id in entries,
     )
 
   if children.len() > 0 {
@@ -164,11 +160,14 @@
     for doc in docs.filter(doc => doc.tags.any(tag => tag.id == node.tag.id)) {
       items.push(list.item(_document-row(doc, entries.at(doc.id).loc)))
     }
-    list.item(strong(node.tag.name) + if items.len() > 0 {
-      list(..items)
-    } else {
-      []
-    })
+    list.item(
+      strong(node.tag.name)
+        + if items.len() > 0 {
+          list(..items)
+        } else {
+          []
+        },
+    )
   }
 
   list(render-node(tree))
