@@ -1,11 +1,36 @@
-#import "doc.typ": _core_doc, _doc_uuid, current, documents
-#import "types.typ": image
-#import "categories.typ": category
+#import "doc.typ": _core_doc, current, documents
+#import "types.typ": author, category, img
+#import "tag.typ": tag
+#import "util.typ": _match
+
+#let _validate-parent(docs, id) = {
+  let visited = ()
+  let current = id
+
+  while true {
+    assert(
+      current in docs,
+      message: "Unresolved document: " + current,
+    )
+    assert(
+      current not in visited,
+      message: "Cyclic parent relationship: " + repr(visited + (current,)),
+    )
+
+    visited.push(current)
+    let parent = docs.at(current).parent_id
+    if parent == current {
+      break
+    }
+    current = parent
+  }
+}
 
 // Declare a document. Most arguments map 1:1 onto `_Core_doc` fields and
 #let meta(
   id: none,
-  parent_id: "index",
+  parent_id: auto,
+  file_path: "(no link (uri))",
   //
   title: none,
   authors: none,
@@ -19,7 +44,7 @@
   license: "apache-v2",
   //
   description: "",
-  cover_image: image.null,
+  cover_image: img.null,
   category: category.null,
   tags: (),
   tlb: (:),
@@ -27,8 +52,8 @@
   context {
     let doc = (_core_doc.new)(
       id: id,
-      parent_id: parent_id,
-      did: _doc_uuid(id),
+      parent_id: if parent_id == auto { id } else { parent_id },
+      file_path: file_path,
 
       title: title,
       authors: authors,
@@ -49,12 +74,25 @@
       tags: tags,
 
       tlb: tlb,
-
-      loc: here(),
     )
-    // Attach the document to every tag it lists
+
+    for v in authors {
+      assert(
+        _match(str, v) or _match(author, v),
+        message: "authors must contain strings or author records",
+      )
+    }
     for t in tags {
-      (t.add-doc)(doc)
+      assert(
+        _match(tag, t),
+        message: "tags must contain tag records",
+      )
+    }
+    for keyword in keywords {
+      assert(
+        type(keyword) == str,
+        message: "keywords must contain strings",
+      )
     }
 
     // Register under its id, and make it the current document
@@ -65,10 +103,15 @@
     (current.update)(
       doc,
     )
+
     [#metadata(id) <typst-mode-document-id>]
   }
   context {
     let matches = query(<typst-mode-document-id>).filter(m => m.value == id)
-    assert(matches.len() == 1, message: "ERROR: duplicate document id: `" + id + "`")
+    assert(matches.len() <= 1, message: "ERROR: duplicate document id: `" + id + "`")
+  }
+  context {
+    let docs = (documents.final)()
+    _validate-parent(docs, id)
   }
 }

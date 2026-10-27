@@ -4,8 +4,8 @@
 // tracks the documents attached to it via its own `_state` slot.
 
 #import "record.typ": impl_record, record
-#import "util.typ": _fetch_method
 #import "state.typ": _mkstate, _state
+#import "doc.typ": documents
 
 #import "uid.typ": namespaces, v3
 
@@ -36,51 +36,50 @@
       _parent: self.id,
       id: id,
       name: name,
-      documents: _mkstate(id, (:)),
+      documents: _mkstate(id, ()),
     )
   },
-  // Attach a document by id. Functional updates accumulate documents without
-  // depending on a contextual read from a previous layout pass.
-  add-doc: (self, doc) => {
-    (self.documents.update)(cur => {
-      cur.insert(doc.id, doc)
-      cur
-    })
-  },
   get-doc: self => {
-    (self.documents.get)()
+    (documents.final)().values().filter(doc => doc.tags.any(t => t.id == self.id))
   },
 )
 
-// "super wired" usage: `register` creates a root tag and one child per
-// given name, and returns them as a positional list.
-// ```txt
-// #let (
-//   root,
-//   taga,
-//   tagb
-// ) = (tag.register)(
-//   "taga",
-//   "tagb"
-// )
-// ```
+// Recursively turn a dictionary of child names into a dictionary of nodes.
+// Each node contains its actual tag record and another `children` dictionary.
+// An empty dictionary denotes a leaf.
+#let _build-children(parent, tree) = {
+  assert(type(tree) == dictionary, message: "tag children must be a dictionary")
+  let children = (:)
+  for (name, descendants) in tree {
+    assert(type(descendants) == dictionary, message: "tag children must be a dictionary: " + name)
+    let child = (parent.sub)(name)
+    children.insert(name, (
+      tag: child,
+      children: _build-children(child, descendants),
+    ))
+  }
+  children
+}
+
+// Register a hierarchy. Example:
+// #let tree = (tag.register)("notes", (science: (physics: (:),),))
+// #let physics = tree.children.science.children.physics.tag
 #let tag = (
   tag
     + (
-      register: (..tags) => {
-        let tags = arguments.pos(tags)
+      register: (namespace, tree) => {
+        assert(type(tree) == dictionary, message: "tag tree must be a dictionary")
+        let root_id = _tag_uuid(repr(("registration", namespace)))
         let root = (tag.new)(
           _parent: "",
-          id: "root",
+          id: root_id,
           name: "root",
-          documents: _mkstate(tags.join("-") + ":" + "f8480bdb-6c76-44b5-a0a3-211e55105521", (:)),
+          documents: _mkstate(root_id + ":" + "f8480bdb-6c76-44b5-a0a3-211e55105521", ()),
         )
-        let out = (root,)
-        for t in tags {
-          let n = (root.sub)(t)
-          out.push(n)
-        }
-        out
+        (
+          tag: root,
+          children: _build-children(root, tree),
+        )
       },
     )
 )

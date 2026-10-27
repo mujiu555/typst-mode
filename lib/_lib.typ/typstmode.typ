@@ -1,8 +1,7 @@
 #import "art.typ": meta
-#import "categories.typ": category
-#import "indexer.typ": lookup, mkindex, backlinks, indexers
+#import "indexer.typ": backlinks, indexers, lookup, mkindex
 #import "tag.typ": tag
-#import "types.typ": author, image
+#import "types.typ": author, category, img
 #import "doc.typ": current, documents
-#import "render.typ": template, mkcover, mkheading, render-index
+#import "render.typ": mkcover, mkheading, render-children, render-tags, template
 #import "embed.typ": embed

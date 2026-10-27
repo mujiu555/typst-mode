@@ -3,10 +3,8 @@
 // document; `lookup` turns that label back into a clickable link to the
 // spot. This powers things like an index or cross-references.
 
-#import "uid.typ": namespaces, v3
-
 #import "record.typ": impl_record, record
-#import "state.typ": _mkstate, _state
+#import "state.typ": _mkstate
 
 // Global store of labels: name -> index entry. A fresh `_state` slot is
 // used so it does not collide with the other modules' slots.
@@ -18,10 +16,6 @@
   "85de9db3-3669-4e67-99a3-4658abe657a9",
   (:),
 )
-
-// UUID namespace for index labels, mirroring doc.typ / tag.typ.
-#let _ns_index = v3(namespaces.oid, "5eb885ab-9e08-43ba-bb95-8e6178761d88")
-#let _index_uuid(name) = v3(_ns_index, name)
 
 #let _backlink = record(
   loc: location,
@@ -39,7 +33,7 @@
 #let _indexer = impl_record(
   _indexer,
   // Build a link to the recorded location, shown as `content`.
-  lookup: (self, loc, content) => context {
+  lookup: (self, content) => context {
     link(self.loc, content)
   },
 )
@@ -65,7 +59,7 @@
   // remove the state update and oscillate between layout passes.
   context {
     let matches = query(<typst-mode-index-label>).filter(m => m.value == label)
-    assert(matches.len() == 1, message: "ERROR: duplicate label: `" + label + "`")
+    assert(matches.len() <= 1, message: "ERROR: duplicate label: `" + label + "`")
   }
 }
 
@@ -78,7 +72,7 @@
     recs => recs + ((label): recs.at(label, default: ()) + ((_backlink.new)(loc: loc, content: content),)),
   )
 
-  (cont.lookup)(loc, content)
+  (cont.lookup)(content)
 }
 
 #let backlinks(label) = {
