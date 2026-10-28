@@ -9,6 +9,11 @@
   (),
 )
 
+#let file_base = _mkstate(
+  "c88ae13e-b0cd-4f84-b3e8-759903558a3d",
+  "",
+)
+
 #let _meta-color = rgb("#999")
 #let _nav-color = rgb("#555")
 #let _taxon-color = rgb("#555")
@@ -67,7 +72,7 @@
   // Register outside the heading body: outlines replay that body.
   mkindex(doc.id, block(below: 0.3em, heading(
     depth: 1,
-    text(weight: 600, doc.title) + h(0.5em) + link(doc.file_path, _slug("[" + doc.id + "]")),
+    text(weight: 600, doc.title) + h(0.5em) + link("file://" + file_base + doc.file_path, _slug("[" + doc.id + "]")),
   )))
   let parts = _details(doc)
   let parent-id = doc.parent_id
@@ -86,6 +91,9 @@
   let doc = (current.get)()
   assert("id" in doc, message: "Call meta before mkcover")
   pagebreak(weak: true)
+  (file_base.update)(
+    path => doc.file_base,
+  )
   align(center)[
     #v(1fr)
     #if doc.cover_image.variant in ("path", "data") {

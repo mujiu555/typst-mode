@@ -1,8 +1,8 @@
-#import "uid.typ": namespaces, v3
+#import "uid.typ": namespaces, uid
 #import "util.typ": _check_names, _fetch_method, _is_type, _match, _type_accepts, _type_reserved_names
 
-#let _ns_enum = v3(namespaces.oid, "e4f747b7-fc19-4082-9acf-cd0f1b188bba")
-#let _enum_uuid(name) = v3(_ns_enum, name)
+#let _ns_enum = uid(namespaces.oid, "e4f747b7-fc19-4082-9acf-cd0f1b188bba")
+#let _enum_uid(name) = uid(_ns_enum, name)
 
 // The `fields` method: return a dictionary of field-name -> value for a
 // record instance.
@@ -104,12 +104,12 @@
     _type_reserved_names + _enum_built-ins.keys() + ("fields", "description", "variant", "payload"),
   )
 
-  // The "type" is itself just a dictionary: a UUID identifying it, the
+  // The "type" is itself just a dictionary: a UID identifying it, the
   // declared field map, and a method registry seeded with the `fields`
   // accessor. `_methods.fields` has `fn: _get_fields_record`, so every
   // instance automatically carries a `fields` method.
   let ty = (
-    _type_id: _enum_uuid(repr(variants)),
+    _type_id: _enum_uid(repr(variants)),
     _variants: _variants,
     _methods: (fields: _get_fields_enum),
     description: _description,

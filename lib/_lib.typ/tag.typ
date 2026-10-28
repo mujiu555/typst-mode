@@ -7,11 +7,11 @@
 #import "state.typ": _mkstate, _state
 #import "doc.typ": documents
 
-#import "uid.typ": namespaces, v3
+#import "uid.typ": namespaces, uid
 
-// UUID namespace for tags, mirroring the scheme used in doc.typ.
-#let _ns_tag = v3(namespaces.oid, "ac562613-54f4-4584-8ea4-1401df8d1ed2")
-#let _tag_uuid(name) = v3(_ns_tag, name)
+// uid namespace for tags, mirroring the scheme used in doc.typ.
+#let _ns_tag = uid(namespaces.oid, "ac562613-54f4-4584-8ea4-1401df8d1ed2")
+#let _tag_uid(name) = uid(_ns_tag, name)
 
 // A tag: `_parent` is the id of its parent ("" for the root), `id`/`name`
 // identify it, `documents` is a `_state` slot accumulating attached
@@ -31,7 +31,7 @@
   // a closure defined before `impl` finishes would otherwise capture the
   // bare, method-less type.
   sub: (self, name) => {
-    let id = _tag_uuid(self.id + ":" + name)
+    let id = _tag_uid(self.id + ":" + name)
     (self._type.new)(
       _parent: self.id,
       id: id,
@@ -69,11 +69,11 @@
     + (
       register: (namespace, tree) => {
         assert(type(tree) == dictionary, message: "tag tree must be a dictionary")
-        let root_id = _tag_uuid(repr(("registration", namespace)))
+        let root_id = _tag_uid(repr(("registration", namespace)))
         let root = (tag.new)(
-          _parent: "",
+          _parent: namespace,
           id: root_id,
-          name: "root",
+          name: namespace,
           documents: _mkstate(root_id + ":" + "f8480bdb-6c76-44b5-a0a3-211e55105521", ()),
         )
         (

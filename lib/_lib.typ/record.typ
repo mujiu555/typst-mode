@@ -2,7 +2,7 @@
 // A small structural type-system built on top of plain Typst dictionaries.
 //
 // A *record type* is a dictionary carrying three private keys:
-//   _type_id — a UUID unique to this type (derived from its field map)
+//   _type_id — a UID unique to this type (derived from its field map)
 //   _fields  — dictionary of field-name -> expected type
 //   _methods — dictionary of method-name -> (name, type, fn)
 // A *record instance* is a dictionary carrying `_type` (its type) plus one
@@ -14,11 +14,11 @@
 // the second are allowed (asymmetric / structural-subtype behaviour). Raw
 // Typst types (`int`, `str`, ...) match against `type(value)`.
 
-#import "uid.typ": namespaces, v3
+#import "uid.typ": namespaces, uid
 #import "util.typ": _check_names, _fetch_method, _is_type, _match, _type_accepts, _type_reserved_names
 
-#let _ns_record = v3(namespaces.oid, "e2487d38-8caa-481f-9a15-a7a3853e1d72")
-#let _record_uuid(name) = v3(_ns_record, name)
+#let _ns_record = uid(namespaces.oid, "e2487d38-8caa-481f-9a15-a7a3853e1d72")
+#let _record_uid(name) = uid(_ns_record, name)
 
 // The `fields` method: return a dictionary of field-name -> value for a
 // record instance.
@@ -174,12 +174,12 @@
     assert(_is_type(ty), message: "field `" + name + "`: expected a type; use an enum for alternatives")
   }
 
-  // The "type" is itself just a dictionary: a UUID identifying it, the
+  // The "type" is itself just a dictionary: a UID identifying it, the
   // declared field map, and a method registry seeded with the `fields`
   // accessor. `_methods.fields` has `fn: _get_fields_record`, so every
   // instance automatically carries a `fields` method.
   let ty = (
-    _type_id: _record_uuid(repr(fields)),
+    _type_id: _record_uid(repr(fields)),
     _fields: _fields,
     _methods: (fields: _get_fields_record),
     description: _description,
