@@ -62,7 +62,7 @@
   ])
 }
 
-#let mkoutline(title: [Documents]) = context {
+#let mkoutline(depth: none, title: [Documents]) = context {
   let docs = (documents.final)()
   let active = (current.get)()
   let source = _document-route(active)
