@@ -1,6 +1,6 @@
 #import "doc.typ": current, documents
 #import "types.typ": author
-#import "indexer.typ": backlinks, indexers, mkindex
+#import "indexer.typ": _lookup, backlinks, indexers, mkindex
 #import "state.typ": _mkstate
 #import "util.typ": _match
 
@@ -72,7 +72,9 @@
   // Register outside the heading body: outlines replay that body.
   mkindex(doc.id, block(below: 0.3em, heading(
     depth: 1,
-    text(weight: 600, doc.title) + h(0.5em) + link("file://" + file_base + doc.file_path, _slug("[" + doc.id + "]")),
+    text(weight: 600, doc.title)
+      + h(0.5em)
+      + link("file://" + (file_base.get)() + doc.file_path, _slug("[" + doc.id + "]")),
   )))
   let parts = _details(doc)
   let parent-id = doc.parent_id
@@ -92,12 +94,12 @@
   assert("id" in doc, message: "Call meta before mkcover")
   pagebreak(weak: true)
   (file_base.update)(
-    path => doc.file_base,
+    path => doc.file_path,
   )
   align(center)[
     #v(1fr)
     #if doc.cover_image.variant in ("path", "data") {
-      image(doc.cover_image.payload.p, width: 60%)
+      image(doc.cover_image.payload, width: 60%)
       v(1em)
     }
     #text(size: 2em, weight: 600, doc.title)
@@ -120,6 +122,11 @@
 
   ]
   pagebreak(weak: true)
+}
+
+#let lookup(label, content) = context {
+  let doc = (current.get)()
+  _lookup(label, content, doc_id: doc.id)
 }
 
 // Shared outline row, using the destination's page counter and numbering.

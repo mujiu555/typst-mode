@@ -4,6 +4,7 @@
 // spot. This powers things like an index or cross-references.
 
 #import "record.typ": impl_record, record
+#import "enum.typ": enumerator
 #import "state.typ": _mkstate
 
 // Global store of labels: name -> index entry. A fresh `_state` slot is
@@ -17,9 +18,21 @@
   (:),
 )
 
+#let _ctx = enumerator(
+  doc: str,
+  null: record(),
+)
+#let _ctx = (
+  _ctx
+    + (
+      null: (_ctx.null)(),
+    )
+)
+
 #let _backlink = record(
   loc: location,
   content: content,
+  ctx: _ctx,
 )
 
 // An index entry: the label text, the location it points at, and the
@@ -64,12 +77,28 @@
 }
 
 // Look up a previously registered label and render a link to it.
-#let lookup(label, content) = context {
+#let _lookup(label, content, doc_id: auto) = context {
   let loc = here()
   let cont = (_labels.final)().at(label)
 
   (_refrecs.update)(
-    recs => recs + ((label): recs.at(label, default: ()) + ((_backlink.new)(loc: loc, content: content),)),
+    recs => (
+      recs
+        + (
+          (label): recs.at(label, default: ())
+            + (
+              (_backlink.new)(
+                loc: loc,
+                content: content,
+                ctx: if doc_id == auto {
+                  _ctx.null
+                } else {
+                  (_ctx.doc)(doc_id)
+                },
+              ),
+            ),
+        )
+    ),
   )
 
   (cont.lookup)(content)

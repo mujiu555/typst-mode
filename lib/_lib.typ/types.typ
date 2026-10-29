@@ -11,8 +11,8 @@
 )
 
 #let img = enumerator(
-  path: record(p: str), // TODO: use path
-  data: record(p: bytes), // user to read the file `(img.data)(p: read("file", encoding: none))`
+  path: str, // TODO: use path
+  data: bytes, // user to read the file `(img.data)(read("file", encoding: none))`
   null: record(),
 )
 #let img = img + (null: (img.null)())
