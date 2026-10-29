@@ -126,7 +126,11 @@
 
 #let lookup(label, content) = context {
   let doc = (current.get)()
-  _lookup(label, content, doc_id: doc.id)
+  if "id" in doc {
+    _lookup(label, content, doc_id: doc.id)
+  } else {
+    _lookup(label, content)
+  }
 }
 
 // Shared outline row, using the destination's page counter and numbering.
