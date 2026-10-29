@@ -11,7 +11,13 @@
 #entry(id: "home", title: [Home], authors: ())
 #embed[
   #meta(id: "research", parent_id: "home", title: [Research], authors: ())
-  #mkdoc[Research notes.]
+  #mkdoc[
+    = Research questions
+    Research notes.
+    == Open problems
+    More to explore.
+    #mkoutline()
+  ]
   #embed[
     #meta(id: "review", parent_id: "research", title: [Literature review], authors: ())
     #mkdoc[Review content.]

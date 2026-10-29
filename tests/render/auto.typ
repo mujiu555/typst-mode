@@ -7,6 +7,7 @@
 #meta(id: "root", title: [Auto root], authors: ())
 #mkcover()
 #mkdoc[
+  #mkoutline()
   #lookup("child", [Forward reference])
   #render-children([Children])
   #render-tags(tree)
