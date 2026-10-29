@@ -15,6 +15,13 @@
   else if target() == "paged" { _pdf.mkdoc(..args) }
   else { _html.mkdoc(..args) }
 }
+#let mkoutline = (..args) => context {
+  if target() == "bundle" or _ssg.is-bundle-output() {
+    _ssg.mkoutline(..args)
+  } else {
+    outline(..args)
+  }
+}
 #let render-children = _auto(_pdf.render-children, _html.render-children)
 #let render-tags = _auto(_pdf.render-tags, _html.render-tags)
 

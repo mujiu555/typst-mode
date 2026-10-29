@@ -6,6 +6,7 @@
 // This module uses Typst's built-in html; the public html namespace wraps it.
 #let stylesheet = read("html.render.css")
 #let entities = _mkstate("tysty-html-render-entities", ())
+#let section-outlines = _mkstate("tysty-html-section-outlines", (:))
 
 #let _element(tag, class, body) = html.elem(tag, attrs: (class: class), body)
 
@@ -38,7 +39,13 @@
   }
   if links.len() > 0 {
     html.elem("nav", attrs: (class: "tysty-navigation", aria-label: "Note navigation"), links.join(" · "))
+  } else {
+    []
   }
+}
+
+#let _breadcrumbs(doc) = context {
+  let entries = indexers()
   let docs = (documents.final)()
   let crumbs = ()
   let id = doc.id
@@ -51,20 +58,68 @@
   html.elem("nav", attrs: (class: "tysty-breadcrumbs", aria-label: "Breadcrumb"), crumbs.join(" / "))
 }
 
+// Section headings are collected only while rendering this note's body.
+#let section-outline(doc) = context {
+  let sections = (section-outlines.final)().at(doc.id, default: ())
+  if sections.len() == 0 {
+    []
+  } else {
+    html.elem("nav", attrs: (class: "tysty-section-list", aria-label: "Sections"),
+      sections.map(section => html.elem("div", attrs: (class: "tysty-section level-" + str(section.level)),
+        link("#" + section.anchor, section.title))).join())
+  }
+}
+
 // new-page is accepted for shared PDF/HTML source; HTML flows continuously.
-#let mkdoc(new-page: true, content) = context {
+#let mkdoc(new-page: true, ssg: false, outline: none, content) = context {
   let doc = (current.get)()
   (entities.update)(ids => ids + (doc.id,))
-  _element("article", "tysty-note", [
+  let article = _element("article", "tysty-note", [
     #mkindex(doc.id, heading(depth: 1, doc.title))
     #_details(doc)
-    #_navigation(doc)
+    #if not ssg { _navigation(doc) }
+    #if not ssg { _breadcrumbs(doc) }
     #if doc.file_path != "(no link (uri))" and doc.file_path != "" {
       _element("p", "tysty-source", link(doc.file_path, [Source]))
     }
     #if doc.abstract != "" { _element("p", "tysty-abstract", doc.abstract) }
+    #show heading: it => {
+      if ssg {
+        let active-doc = (current.get)()
+        let records = (section-outlines.get)().at(active-doc.id, default: ())
+        let anchor = "tysty-section-" + active-doc.id + "-" + str(records.len())
+        (section-outlines.update)(all => {
+          let prior = all.at(active-doc.id, default: ())
+          all + ((active-doc.id): prior + ((anchor: anchor, title: it.body, level: it.level),))
+        })
+        let numbering = if it.numbering == none {
+          []
+        } else {
+          counter(heading).display(it.numbering) + h(0.5em)
+        }
+        html.elem("h" + str(calc.min(it.level + 1, 6)), attrs: (id: anchor), [#numbering #it.body])
+      } else {
+        it
+      }
+    }
     #content
   ])
+  if ssg {
+    _element("div", "tysty-site-page", [
+      #_element("header", "tysty-topbar", [#_navigation(doc) #_breadcrumbs(doc)])
+      #_element("div", "tysty-page-layout", [
+        #article
+        #if outline != none {
+          _element("aside", "tysty-page-outline", [
+            #html.elem("h2", "On this page")
+            #outline
+          ])
+        }
+      ])
+    ])
+  } else {
+    article
+  }
 }
 
 // Covers are presentation only, outside the primary-index reading sequence.

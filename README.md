@@ -184,13 +184,22 @@ Root: /                         ; Project root
 #show: ssg.render.site
 
 // The entry declares the root document and lets mkdoc generate its route.
-#entry(id: "home", title: [Notebook], authors: ())[]
+#entry(id: "home", title: [Notebook], authors: ())[
+  Entry page
+]
 
 // An embed can declare and emit its own child page. The route is computed
 // from the document ID; nested ancestors become route directories.
 #embed[
   #meta(id: "research", parent_id: "home", title: [Research], authors: ())
-  #mkdoc[Research notes.]
+  #mkdoc[
+    = Research questions
+    Research notes.
+    == Open problems
+    More to explore.
+    // The automatic mkoutline selects the route-aware document tree in bundles.
+    #mkoutline()
+  ]
 
   #embed[
     #meta(id: "review", parent_id: "research", title: [Review], authors: ())
@@ -201,6 +210,8 @@ Root: /                         ; Project root
 // Outputs: index.html, research/index.html,
 // research/review/index.html, and tysty.css.
 // mkdoc uses each document's metadata and parent chain to determine its route.
+// Navigation and breadcrumbs are in the top bar; section links appear in the right sidebar.
+// mkoutline() uses Typst's outline for PDF/single HTML and SSG routes for bundles.
 // Keep page-producing mkdoc calls outside another page's mkdoc body.
 ```
 
