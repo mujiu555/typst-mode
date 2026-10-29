@@ -8,6 +8,7 @@
 #let _bundle-output = _mkstate("5d162f87-0e2c-4264-87b7-78b8383ee73c", false)
 #let is-bundle-output = () => (_bundle-output.get)()
 #let entities = _mkstate("0a4d3ddb-f9f7-4343-bb68-b9cd28429263", ())
+#let _page-bodies = _mkstate("tysty-ssg-page-bodies", (:))
 
 // Create a stable route from explicit semantic ancestry. This is pure so the
 // caller can calculate routes before emitting any bundle documents.
@@ -86,6 +87,19 @@
   ])
 }
 
+// Embed a generated page's Typst body by its document label.
+#let ref(label) = context {
+  let docs = (documents.final)()
+  let doc = docs.at(label)
+  let generated = (entities.final)()
+  assert(label in generated, message: "SSG page is registered but has not been generated: `" + label + "`")
+  let body = (_page-bodies.final)().at(label)
+  (current.enter)()
+  (current.update)(doc)
+  body
+  (current.leave)()
+}
+
 // Bundle mkdoc uses the route derived from current metadata. Other targets
 // keep their ordinary HTML/PDF rendering behavior.
 #let mkdoc(body) = context {
@@ -93,6 +107,7 @@
     (_bundle-output.update)(_ => true)
     let doc = (current.get)()
     (entities.update)(ids => if doc.id in ids { ids } else { ids + (doc.id,) })
+    (_page-bodies.update)(pages => pages + ((doc.id): body))
     let path = _document-route(doc)
     let depth = path.split("/").len() - 1
     let css-href = "../" * depth + "tysty.css"
