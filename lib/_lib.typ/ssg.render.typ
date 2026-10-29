@@ -5,13 +5,20 @@
 
 // `document()` switches nested page content to the HTML target, so retain the
 // outer bundle target for automatic render helpers called inside a page.
-#let _bundle-output = _mkstate("tysty-ssg-bundle-output", false)
+#let _bundle-output = _mkstate("5d162f87-0e2c-4264-87b7-78b8383ee73c", false)
 #let is-bundle-output = () => (_bundle-output.get)()
+#let entities = _mkstate("0a4d3ddb-f9f7-4343-bb68-b9cd28429263", ())
 
 // Create a stable route from explicit semantic ancestry. This is pure so the
 // caller can calculate routes before emitting any bundle documents.
 #let _slug(value) = {
-  let slug = lower(value).replace(regex("[^a-z0-9]+"), "-").trim("-")
+  // Keep Unicode letters and digits. Slashes remain route separators so
+  // identifiers such as `guides/setup` can describe a multi-file route.
+  let slug = lower(value)
+    .split("/")
+    .map(part => part.replace(regex("[^\\p{L}\\p{N}]+"), "-").trim("-"))
+    .filter(part => part != "")
+    .join("/")
   if slug == "" { "untitled" } else { slug }
 }
 
@@ -50,26 +57,32 @@
 }
 
 // A route-aware outline of all registered documents, grouped by parent.
-#let _outline-node(doc, docs, source, active-id) = {
+#let _outline-node(doc, docs, generated, source, active-id) = {
   let children = docs.values().filter(child => child.parent_id == doc.id and child.id != doc.id)
   let href = _relative-route(_document-route(doc), source)
   let attrs = (href: href) + if doc.id == active-id { (aria-current: "page") } else { (:) }
+  let label = if doc.id in generated {
+    html.elem("a", attrs: attrs, doc.title)
+  } else {
+    html.elem("span", attrs: (class: "tysty-unrendered"), doc.title)
+  }
   html.elem("li", [
-    #html.elem("a", attrs: attrs, doc.title)
+    #label
     #if children.len() > 0 {
-      html.elem("ul", children.map(child => _outline-node(child, docs, source, active-id)).join())
+      html.elem("ul", children.map(child => _outline-node(child, docs, generated, source, active-id)).join())
     }
   ])
 }
 
 #let mkoutline(depth: none, title: [Documents]) = context {
   let docs = (documents.final)()
+  let generated = (entities.final)()
   let active = (current.get)()
   let source = _document-route(active)
   let roots = docs.values().filter(doc => doc.parent_id == doc.id)
   html.elem("nav", attrs: (class: "tysty-site-outline", aria-label: "Site outline"), [
     #html.elem("h2", title)
-    #html.elem("ul", roots.map(doc => _outline-node(doc, docs, source, active.id)).join())
+    #html.elem("ul", roots.map(doc => _outline-node(doc, docs, generated, source, active.id)).join())
   ])
 }
 
@@ -79,6 +92,7 @@
   if target() == "bundle" {
     (_bundle-output.update)(_ => true)
     let doc = (current.get)()
+    (entities.update)(ids => if doc.id in ids { ids } else { ids + (doc.id,) })
     let path = _document-route(doc)
     let depth = path.split("/").len() - 1
     let css-href = "../" * depth + "tysty.css"

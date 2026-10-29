@@ -5,8 +5,8 @@
 
 // This module uses Typst's built-in html; the public html namespace wraps it.
 #let stylesheet = read("html.render.css")
-#let entities = _mkstate("tysty-html-render-entities", ())
-#let section-outlines = _mkstate("tysty-html-section-outlines", (:))
+#let entities = _mkstate("f283d7de-3081-4649-99db-ed2695f5bdaa", ())
+#let section-outlines = _mkstate("ef875bf6-8365-4649-8558-0d4beaf5422c", (:))
 
 #let _element(tag, class, body) = html.elem(tag, attrs: (class: class), body)
 
@@ -16,8 +16,11 @@
   })
   let parts = ()
   if authors.len() > 0 { parts.push(authors.join(", ")) }
-  parts.push(html.elem("time", attrs: (datetime: doc.date.display("[year]-[month]-[day]")),
-    doc.date.display("[year]-[month]-[day]")))
+  parts.push(html.elem(
+    "time",
+    attrs: (datetime: doc.date.display("[year]-[month]-[day]")),
+    doc.date.display("[year]-[month]-[day]"),
+  ))
   if doc.tags.len() > 0 { parts.push(doc.tags.map(t => t.name).join(", ")) }
   _element("div", "tysty-details", parts.join(" · "))
 }
@@ -64,9 +67,16 @@
   if sections.len() == 0 {
     []
   } else {
-    html.elem("nav", attrs: (class: "tysty-section-list", aria-label: "Sections"),
-      sections.map(section => html.elem("div", attrs: (class: "tysty-section level-" + str(section.level)),
-        link("#" + section.anchor, section.title))).join())
+    html.elem(
+      "nav",
+      attrs: (class: "tysty-section-list", aria-label: "Sections"),
+      sections
+        .map(section => html.elem("div", attrs: (class: "tysty-section level-" + str(section.level)), link(
+          "#" + section.anchor,
+          section.title,
+        )))
+        .join(),
+    )
   }
 }
 
@@ -139,8 +149,9 @@
   let doc = (current.get)()
   let entries = indexers()
   let ids = (entities.final)()
-  let children = (documents.final)().values().filter(d =>
-    d.parent_id == doc.id and d.id != doc.id and d.id in ids and d.id in entries)
+  let children = (documents.final)()
+    .values()
+    .filter(d => d.parent_id == doc.id and d.id != doc.id and d.id in ids and d.id in entries)
   if children.len() > 0 {
     _element("section", "tysty-children", [
       #heading(level: 2, outlined: false, title)
@@ -183,9 +194,12 @@
 // Paths are relative to the output bundle, independent of document IDs.
 // Each page restores the caller's current-document scope.
 #let page(path, body, title: "Notebook", lang: "en") = {
-  assert(path.ends-with(".html") and not path.starts-with("/")
-    and path.split("/").all(p => p != ".." and p != "." and p != ""),
-    message: "HTML page path must be a relative .html path without dot segments")
+  assert(
+    path.ends-with(".html")
+      and not path.starts-with("/")
+      and path.split("/").all(p => p != ".." and p != "." and p != ""),
+    message: "HTML page path must be a relative .html path without dot segments",
+  )
   let css-href = "../" * (path.split("/").len() - 1) + "tysty.css"
   document(path, title: title)[
     #(current.enter)()
