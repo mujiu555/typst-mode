@@ -3,5 +3,5 @@
 #import "/tests/fixtures/rendered_text.typ": observe-text, rendered-text
 #show text: observe-text
 #meta(id: "cover", title: [COVERSENTINEL], authors: ())
-#mkcover()
+#pdf.render.mkcover()
 #context assert.eq(rendered-text().matches(regex("COVERSENTINEL")).len(), 1, message: "Cover title must appear exactly once")

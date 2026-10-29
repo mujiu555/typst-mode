@@ -8,13 +8,13 @@
  #image(png, width: 100%, height: 100%, fit: "stretch")
  #metadata("PNG background") <png-background>
 ])
-#meta(id: "png-cover", title: [PNG cover], authors: (), cover_image: (img.data)(p: png))
-#mkcover()
+#meta(id: "png-cover", title: [PNG cover], authors: (), cover_image: (img.data)(png))
+#pdf.render.mkcover()
 #context {
  assert(query(<png-background>).len() >= 1, message: "Background must be laid out")
  assert(query(image).len() >= 2, message: "PNG image elements must be laid out")
  assert.eq(rendered-text().matches(regex("PNG cover")).len(), 1)
  assert.eq(counter(page).final().first(), 1, message: "Normal-size cover should fit one page")
- assert.eq((current.get)().cover_image.payload.p, png)
+ assert.eq((current.get)().cover_image.payload, png)
 }
 // Manual visual check: pale-blue background behind readable title.

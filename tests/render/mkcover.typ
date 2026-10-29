@@ -4,7 +4,7 @@
 // Manual: typst compile --root . tests/render/mkcover.typ /tmp/typst-unit-test.pdf
 #import "/lib/_lib.typ/lib.typ": *
 #meta(id: "unit", title: [Title], authors: ("Alice",))
-#mkcover()
+#pdf.render.mkcover()
 #context {
  assert.eq(rendered-text().matches(regex("Title")).len(), 1)
  assert(rendered-text().contains("Title"))

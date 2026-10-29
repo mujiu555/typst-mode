@@ -44,7 +44,12 @@ Root: /                         ; Project root
 // Compile with: typst compile --root . notebook.typ
 // Use your installed package version, e.g. "@preview/tysty:0.1.0".
 // For a local checkout, import "lib/_lib.typ/lib.typ" instead.
-#import "@preview/tysty": *
+#import "lib/_lib.typ/lib.typ": *
+// Top-level APIs automatically select PDF or HTML at the call site.
+// The render module provides the same automatic APIs as render.mkdoc, etc.
+// Explicit pdf.render.* and html.render.* APIs remain available.
+// Export this source as HTML with: typst compile --features html notebook.typ notebook.html
+#show: template
 
 // Register a namespace and its nested tags.
 #let topics = (tag.register)("notebook", (
@@ -127,6 +132,76 @@ Root: /                         ; Project root
 // render-children([Child notes]) lists children of the current document.
 // render-tags(topics) renders the registered tag tree and its rendered notes.
 // These views resolve registered targets even when they appear later in the source.
+```
+
+```typst
+// HTML bundle example: save as website.typ in the project root.
+// Requires Typst 0.15+.
+// typst compile --root . --features html,bundle --format bundle website.typ site
+// The output contains index.html, notes/motion.html, and tysty.css.
+// Bundle background and typography can be customized with:
+// #show: html.render.bundle.with(css: read("my-theme.css"))
+#import "lib/_lib.typ/lib.typ": *
+// At bundle scope, the automatic template emits the shared CSS asset.
+#show: template
+
+#html.render.page("index.html", title: "Notebook")[
+  #meta(id: "home", title: [Notebook], authors: ("Alice",))
+  #html.render.mkcover()
+  #html.render.mkdoc[
+    Read #html.render.lookup("motion", [the motion note]).
+    #html.render.render-children([Notes])
+  ]
+]
+
+#html.render.page("notes/motion.html", title: "Motion")[
+  #meta(id: "motion", parent_id: "home", title: [Motion], authors: ("Alice",))
+  #html.render.mkdoc[
+    Velocity describes how position changes over time.
+    Return to #html.render.lookup("home", [the notebook]).
+  ]
+]
+
+// page creates an output file and restores the surrounding document context.
+// mkdoc registers the note; mkcover does not register an index target.
+// Links and backlinks resolve across all pages in the bundle.
+// Each page links to the shared CSS using its relative output path.
+//
+// For single-file HTML, omit bundle and page, and use:
+// #show: html.render.template.with(title: "Notebook")
+// #meta(id: "home", title: [Notebook], authors: ())
+// #html.render.mkdoc[Hello]
+// Compile with: typst compile --features html website.typ website.html
+// template embeds CSS by default; css: read("my-theme.css") overrides it.
+```
+
+## Static site generation
+
+```typst
+// Save as site.typ. Requires Typst 0.15+.
+// Compile with: typst compile --root . --features html,bundle --format bundle site.typ output
+#import "lib/_lib.typ/lib.typ": *
+#show: ssg.render.site
+
+// The entry declares the root document and lets mkdoc generate its route.
+#entry(id: "home", title: [Notebook], authors: ())[]
+
+// An embed can declare and emit its own child page. The route is computed
+// from the document ID; nested ancestors become route directories.
+#embed[
+  #meta(id: "research", parent_id: "home", title: [Research], authors: ())
+  #mkdoc[Research notes.]
+
+  #embed[
+    #meta(id: "review", parent_id: "research", title: [Review], authors: ())
+    #mkdoc[Literature review.]
+  ]
+]
+
+// Outputs: index.html, research/index.html,
+// research/review/index.html, and tysty.css.
+// mkdoc uses each document's metadata and parent chain to determine its route.
+// Keep page-producing mkdoc calls outside another page's mkdoc body.
 ```
 
 ## Plans

@@ -1,6 +1,6 @@
 // Function test: indexer/lookup_backlinks
 // Manual: typst compile --root . tests/indexer/lookup_backlinks.typ /tmp/typst-unit-test.pdf
-#import "/lib/_lib.typ/lib.typ": *
+#import "/lib/_lib.typ/indexer.typ": _lookup as lookup, mkindex, indexers, backlinks
 #lookup("unit", [First])
 #mkindex("unit", [Target])
 #lookup("unit", [Second])
