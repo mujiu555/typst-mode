@@ -12,23 +12,25 @@
 #assert.eq(ssg.route("中文 笔记"), "中文-笔记/index.html")
 
 #meta(id: "home", title: [Home], authors: ())
-#mkdoc[Home page.]
-#embed[
+#ssg.mkdoc[Home page.]
+#ssg.embed[
   #meta(id: "research", parent_id: "home", title: [Research], authors: ())
-  #mkdoc[
+  #ssg.mkdoc[
     = Research questions
     Research notes.
     == Open problems
     More to explore.
+    #heading(outlined: false)[Hidden section]
+    #context heading[Dynamic section]
     #mkoutline()
   ]
-  #embed[
+  #ssg.embed[
     #meta(id: "review", parent_id: "research", title: [Literature review], authors: ())
-    #mkdoc[Review content.]
+    #ssg.mkdoc[Review content.]
   ]
 ]
 #context {
   assert.eq((current.get)().id, "home")
   assert.eq(ssg.entities(), ("home", "research", "review"))
-  assert.eq(documents().find(doc => doc.id == "review").parent_id, "research")
+  assert.eq(html.documents().find(doc => doc.id == "review").parent_id, "research")
 }

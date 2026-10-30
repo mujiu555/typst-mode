@@ -46,7 +46,7 @@ by the following cases:
 | `render.*` | Same automatic functions as the top-level aliases; `api/exports` checks both export surfaces |
 | `pdf.*` | `render/pdf_namespace`, `render/mkcover`, `render/mkcover_png_background`, `reject/render/mkcover_bad_png` |
 | `html.template/mkcover/mkdoc/embed/lookup/render-children/render-tags/page/bundle` | `render/html_single`, `render/html_bundle`, `render/auto_bundle`, `reject/render/page_invalid_path` |
-| `html.stylesheet/section-outline/section-outlines` | `api/exports`, generated section outline checks in `render/ssg` |
+| `html.stylesheet` | `api/exports`, generated section outline checks in `render/ssg` |
 | `ssg.mkoutline`, `ssg.ref`, `ssg.route/mkdoc/embed/is-bundle-output/entities` | `render/ssg`, `render/ssg_ref`, `render/ssg_html`, `reject/render/ssg_ref_unrendered` |
 | Shared renderer `entities()` query, `file_base` state | `render/auto_bundle`, `api/entry` |
 

@@ -39,7 +39,24 @@ function verifyOutput(path, format, destination) {
       contains(join(destination, page), `href="${css}"`);
     }
     contains(join(destination, 'research/index.html'), 'Research questions');
-    contains(join(destination, 'research/index.html'), 'class="tysty-section-list"');
+    contains(join(destination, 'research/index.html'), 'class="tysty-page-outline"');
+    const research = readFileSync(join(destination, 'research/index.html'), 'utf8');
+    for (const page of ['index.html', 'research/index.html', 'research/review/index.html']) {
+      const html = readFileSync(join(destination, page), 'utf8');
+      assert(html.includes('class="tysty-page-outline"'), 'Pages must retain the right sidebar');
+      assert(html.includes('class="tysty-topbar"'), 'Pages must retain the top navigation');
+    }
+    const sidebar = research.match(/<aside class="tysty-page-outline">([\s\S]*?)<\/aside>/)?.[1];
+    const links = [...sidebar.matchAll(/<a href="#([^"]+)"[^>]*>([^<]+)<\/a>/g)];
+    assert.equal(links.length, 3, 'Sidebar must include outlined body headings');
+    assert(!sidebar.includes('href="../index.html#'), 'Outline must exclude headings from the root page');
+    assert(!sidebar.includes('href="review/index.html#'), 'Outline must exclude headings from child pages');
+    assert(!sidebar.includes('Hidden section'), 'Outline must omit headings with outlined: false');
+    for (const title of ['Research questions', 'Open problems', 'Dynamic section']) {
+      const entry = links.find(match => match[2].includes(title));
+      assert(entry, title + ' must have a plain string link');
+      assert(research.includes('id="' + entry[1] + '"'), title + ' must link to an existing heading');
+    }
     contains(join(destination, 'research/index.html'), 'href="review/index.html"');
     assert(readFileSync(join(destination, 'tysty.css'), 'utf8').length > 0);
   }

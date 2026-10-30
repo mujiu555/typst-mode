@@ -5,6 +5,7 @@
 #ssg.mkdoc[Fallback body.]
 #context {
   assert.eq(indexers().map(index => index.label), ("single",))
+  assert(not ssg.is-bundle-output())
   assert.eq(ssg.entities(), ())
   assert.eq(html.entities(), ("single",))
 }
