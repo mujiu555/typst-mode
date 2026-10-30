@@ -87,13 +87,13 @@
   let doc = (current.get)()
   (entities.update)(ids => ids + (doc.id,))
   let article = _element("article", "tysty-note", [
-    #mkindex(doc.id, heading(depth: 1, doc.title))
+    #mkindex(doc.id, heading(depth: 1, [
+      #doc.title
+      #_element("span", "tysty-note-id", link((file_base.get)() + doc.file_path, "[" + doc.id + "]"))
+    ]))
     #_details(doc)
     #if not ssg { _navigation(doc) }
     #if not ssg { _breadcrumbs(doc) }
-    #if doc.file_path != "(no link (uri))" and doc.file_path != "" {
-      _element("p", "tysty-source", link((file_base.get)() + doc.file_path, [Source]))
-    }
     #if doc.abstract != "" { _element("p", "tysty-abstract", doc.abstract) }
     #show heading: it => {
       if ssg {
