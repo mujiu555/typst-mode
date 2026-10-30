@@ -1,5 +1,5 @@
 // typst compile --root . --features html,bundle --format bundle tests/render/html_bundle.typ /tmp/tysty-html-bundle
-#import "/lib/_lib.typ/lib.typ": *
+#import "@local/tysty:0.1.0": *
 #import "/tests/fixtures/png.typ": png
 #show: html.render.bundle
 #let tree = (tag.register)("topics", (science: (:),))

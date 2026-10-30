@@ -1,6 +1,6 @@
 // Function test: art/meta
 // Manual: typst compile --root . tests/art/meta.typ /tmp/typst-unit-test.pdf
-#import "/lib/_lib.typ/lib.typ": *
+#import "@local/tysty:0.1.0": *
 #meta(id: "unit", title: [Title], authors: ("Alice",), abstract: "Abstract")
 #context {
  let d = (current.get)()

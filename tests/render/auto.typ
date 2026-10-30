@@ -1,5 +1,5 @@
 // Compile this same source as PDF and HTML to exercise target dispatch.
-#import "/lib/_lib.typ/lib.typ": *
+#import "@local/tysty:0.1.0": *
 #show: template
 #let tree = (tag.register)("topics", (science: (:),))
 #mkindex("standalone", [Independent target])

@@ -1,12 +1,15 @@
 // typst compile --root . --features html,bundle --format bundle tests/render/ssg.typ /tmp/tysty-ssg
-#import "/lib/_lib.typ/lib.typ": *
-#show: render.entry
+#import "@local/tysty:0.1.0": *
+#show: template
 
 // Calculate routes before emitting bundle documents. Bundle pages are
-// top-level outputs; Typst does not allow a bundle document inside embed.
+// top-level outputs; keep them outside another mkdoc body.
 #assert.eq(ssg.render.route("home", root: true), "index.html")
 #assert.eq(ssg.render.route("Research"), "research/index.html")
 #assert.eq(ssg.render.route("Lit Review", ancestors: ("Research",)), "research/lit-review/index.html")
+#assert.eq(ssg.render.route("  !!!  "), "untitled/index.html")
+#assert.eq(ssg.render.route("Guides/Setup"), "guides/setup/index.html")
+#assert.eq(ssg.render.route("中文 笔记"), "中文-笔记/index.html")
 
 #meta(id: "home", title: [Home], authors: ())
 #mkdoc[Home page.]
@@ -24,3 +27,8 @@
     #mkdoc[Review content.]
   ]
 ]
+#context {
+  assert.eq((current.get)().id, "home")
+  assert.eq((ssg.render.entities.final)(), ("home", "research", "review"))
+  assert.eq((documents.final)().review.parent_id, "research")
+}

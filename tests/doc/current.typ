@@ -1,6 +1,6 @@
 // Function test: doc/current
 // Manual: typst compile --root . tests/doc/current.typ /tmp/typst-unit-test.pdf
-#import "/lib/_lib.typ/doc.typ": current
+#import "@local/tysty:0.1.0": current
 #(current.update)((id: "root"))
 #(current.enter)()
 #(current.update)(v => (id: v.id + "-child"))

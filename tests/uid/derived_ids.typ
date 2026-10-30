@@ -12,5 +12,5 @@
   assert(make("same") != make("other"))
 }
 // IDs can serve as namespaces for another level of derivation.
-// Independent reference: uuid.uuid5(uuid.uuid5(uuid.NAMESPACE_DNS, "parent"), "child").
-#assert.eq(uid(uid(namespaces.dns, "parent"), "child"), "99b04eb5-12b7-5868-bd39-53a50a9631bf")
+// Independent reference: apply FNV-1a 32 and container encoding twice.
+#assert.eq(uid(uid(namespaces.dns, "parent"), "child"), "e69b479c-0000-8000-8000-000000000000")
