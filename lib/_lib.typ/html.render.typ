@@ -1,14 +1,12 @@
 #import "doc.typ": current, documents
 #import "indexer.typ": indexers, mkindex
-#import "render.common.typ": entities, file_base, lookup, _breadcrumb-path
-#import "state.typ": _mkstate
+#import "render.common.typ": _breadcrumb-path, entities, file_base, lookup
 #import "embed.typ": _embed
 
 #let embed(offset: false, body) = _embed(body, offset: offset)
 
 // This module uses Typst's built-in html; the public html namespace wraps it.
 #let stylesheet = read("html.render.css")
-#let section-outlines = _mkstate("ef875bf6-8365-4649-8558-0d4beaf5422c", (:))
 
 #let _element(tag, class, body) = html.elem(tag, attrs: (class: class), body)
 
@@ -54,32 +52,16 @@
   let docs = documents()
   let path = _breadcrumb-path(doc, docs)
   let crumbs = path.map(node => {
-    if entries.any(index => index.label == node.id) { link(entries.find(index => index.label == node.id).loc, node.title) } else { node.title }
+    if entries.any(index => index.label == node.id) {
+      link(entries.find(index => index.label == node.id).loc, node.title)
+    } else { node.title }
   })
   html.elem("nav", attrs: (class: "tysty-breadcrumbs", aria-label: "Breadcrumb"), crumbs.join(" / "))
 }
 
-// Section headings are collected only while rendering this note's body.
-#let section-outline(doc) = context {
-  let sections = (section-outlines.final)().at(doc.id, default: ())
-  if sections.len() == 0 {
-    []
-  } else {
-    html.elem(
-      "nav",
-      attrs: (class: "tysty-section-list", aria-label: "Sections"),
-      sections
-        .map(section => html.elem("div", attrs: (class: "tysty-section level-" + str(section.level)), link(
-          "#" + section.anchor,
-          section.title,
-        )))
-        .join(),
-    )
-  }
-}
-
 // new-page is accepted for shared PDF/HTML source; HTML flows continuously.
-#let mkdoc(new-page: true, ssg: false, outline: none, content) = context {
+#let mkdoc(new-page: true, ssg: false, content) = context {
+  let scope = here()
   let doc = (current.get)()
   [#metadata(doc.id) <tysty-rendered-document>]
   let article = _element("article", "tysty-note", [
@@ -91,25 +73,6 @@
     #if not ssg { _navigation(doc) }
     #if not ssg { _breadcrumbs(doc) }
     #if doc.abstract != "" { _element("p", "tysty-abstract", doc.abstract) }
-    #show heading: it => {
-      if ssg {
-        let active-doc = (current.get)()
-        let records = (section-outlines.get)().at(active-doc.id, default: ())
-        let anchor = "tysty-section-" + active-doc.id + "-" + str(records.len())
-        (section-outlines.update)(all => {
-          let prior = all.at(active-doc.id, default: ())
-          all + ((active-doc.id): prior + ((anchor: anchor, title: it.body, level: it.level),))
-        })
-        let numbering = if it.numbering == none {
-          []
-        } else {
-          counter(heading).display(it.numbering) + h(0.5em)
-        }
-        html.elem("h" + str(calc.min(it.level + 1, 6)), attrs: (id: anchor), [#numbering #it.body])
-      } else {
-        it
-      }
-    }
     #content
   ])
   if ssg {
@@ -117,12 +80,10 @@
       #_element("header", "tysty-topbar", [#_navigation(doc) #_breadcrumbs(doc)])
       #_element("div", "tysty-page-layout", [
         #article
-        #if outline != none {
-          _element("aside", "tysty-page-outline", [
-            #html.elem("h2", "On this page")
-            #outline
-          ])
-        }
+        #_element("aside", "tysty-page-outline", outline(
+          title: none,
+          target: heading.where(outlined: true).within(scope),
+        ))
       ])
     ])
   } else {
@@ -147,12 +108,13 @@
   let doc = (current.get)()
   let entries = indexers()
   let ids = entities()
-  let children = documents()
-    .filter(d => d.parent_id == doc.id and d.id != doc.id and d.id in ids and entries.any(index => index.label == d.id))
+  let children = documents().filter(d => (
+    d.parent_id == doc.id and d.id != doc.id and d.id in ids and entries.any(index => index.label == d.id)
+  ))
   if children.len() > 0 {
     _element("section", "tysty-children", [
       #heading(level: 2, outlined: false, title)
-      #list(..children.map(d => link(entries.find(index => index.label == d.id).loc, d.title)))
+      #list(..children.map(d => link(entries.find(index => index.label == d.id).loc, d.id)))
     ])
   }
 }

@@ -5,14 +5,10 @@
 
 #import "record.typ": impl_record, record
 #import "enum.typ": enumerator
-#import "state.typ": _mkstate
 
 // Namespace labels for selective queries independent of ordinary document labels.
 #let _index-selector(name) = std.label("typst-mode-index:" + name)
-#let _refrecs = _mkstate(
-  "85de9db3-3669-4e67-99a3-4658abe657a9",
-  (:),
-)
+#let _backlink-selector(name) = std.label("typst-mode-backlink:" + name)
 
 #let _ctx = enumerator(
   doc: str,
@@ -79,31 +75,18 @@
   assert(matches.len() > 0, message: "ERROR: unknown label: `" + label + "`")
   let cont = matches.first().value
 
-  (_refrecs.update)(
-    recs => (
-      recs
-        + (
-          (label): recs.at(label, default: ())
-            + (
-              (_backlink.new)(
-                loc: loc,
-                content: content,
-                ctx: if doc_id == auto {
-                  _ctx.null
-                } else {
-                  (_ctx.doc)(doc_id)
-                },
-              ),
-            ),
-        )
-    ),
+  let backlink = (_backlink.new)(
+    loc: loc,
+    content: content,
+    ctx: if doc_id == auto { _ctx.null } else { (_ctx.doc)(doc_id) },
   )
+  [#metadata(backlink)#_backlink-selector(label)]
 
   (cont.lookup)(content)
 }
 
 #let backlinks(label) = {
-  (_refrecs.final)().at(label, default: ())
+  query(_backlink-selector(label)).map(item => item.value)
 }
 
 // Return index records in document order.

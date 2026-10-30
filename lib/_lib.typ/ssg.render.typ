@@ -1,16 +1,14 @@
 #import "html.render.typ" as _html
 #import "doc.typ": current, documents
-#import "state.typ": _mkstate
 #import "embed.typ": _embed
 
 #let embed(offset: false, body) = _embed(body, offset: offset)
 
 // `document()` switches nested page content to the HTML target, so retain the
 // outer bundle target for automatic render helpers called inside a page.
-#let _bundle-output = _mkstate("5d162f87-0e2c-4264-87b7-78b8383ee73c", false)
-#let is-bundle-output = () => (_bundle-output.get)()
+#let is-bundle-output = () => query(<tysty-bundle-output>).len() > 0
 #let entities() = query(<tysty-ssg-document>).map(item => item.value).dedup()
-#let _page-bodies = _mkstate("tysty-ssg-page-bodies", (:))
+#let _page-body-selector(id) = std.label("tysty-ssg-page-body:" + id)
 
 // Create a stable route from explicit semantic ancestry. This is pure so the
 // caller can calculate routes before emitting any bundle documents.
@@ -95,7 +93,7 @@
   let doc = docs.find(doc => doc.id == label)
   let generated = entities()
   assert(label in generated, message: "SSG page is registered but has not been generated: `" + label + "`")
-  let body = (_page-bodies.final)().at(label)
+  let body = query(_page-body-selector(label)).last().value
   (current.enter)()
   (current.update)(doc)
   body
@@ -106,10 +104,10 @@
 // keep their ordinary HTML/PDF rendering behavior.
 #let mkdoc(body) = context {
   if target() == "bundle" {
-    (_bundle-output.update)(_ => true)
+    [#metadata(true) <tysty-bundle-output>]
     let doc = (current.get)()
     [#metadata(doc.id) <tysty-ssg-document>]
-    (_page-bodies.update)(pages => pages + ((doc.id): body))
+    [#metadata(body)#_page-body-selector(doc.id)]
     let path = _document-route(doc)
     let depth = path.split("/").len() - 1
     let css-href = "../" * depth + "tysty.css"
@@ -117,7 +115,6 @@
       #_html.template(
         _html.mkdoc(
           ssg: true,
-          outline: _html.section-outline(doc),
           body,
         ),
         title: doc.title,

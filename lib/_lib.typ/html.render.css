@@ -22,12 +22,8 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.25; scroll-margin-top: 1rem; }
 .tysty-page-layout .tysty-note { margin: 0; border: 0; }
 .tysty-page-outline { position: sticky; top: calc(var(--nav-height) + 1rem); max-height: calc(100vh - var(--nav-height) - 2rem); overflow: auto; padding: .75rem 1rem; border-inline-start: 1px solid light-dark(#d7dcdf, #42484d); font-size: .9rem; }
 .tysty-page-outline h2, .tysty-site-outline h2 { margin-block: 0 .75rem; font-size: 1rem; }
-.tysty-page-outline ul, .tysty-site-outline ul { margin: 0; padding-inline-start: 1.15rem; }
+.tysty-page-outline ol, .tysty-site-outline ul { margin: 0; padding-inline-start: 1.15rem; }
 .tysty-page-outline li, .tysty-site-outline li { margin-block: .35rem; }
-.tysty-section.level-3 { margin-inline-start: .75rem; }
-.tysty-section.level-4 { margin-inline-start: 1.5rem; }
-.tysty-section.level-5 { margin-inline-start: 2.25rem; }
-.tysty-section.level-6 { margin-inline-start: 3rem; }
 .tysty-site-outline { margin-block: 1rem; }
 .tysty-abstract { max-width: 65ch; font-style: italic; }
 .tysty-cover .tysty-abstract { margin-inline: auto; }
