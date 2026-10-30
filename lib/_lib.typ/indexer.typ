@@ -106,9 +106,7 @@
   (_refrecs.final)().at(label, default: ())
 }
 
+// Return index records in document order.
 #let indexers() = {
-  query(<typst-mode-index-label>).fold((:), (entries, item) => {
-    let index = item.value
-    entries + ((index.label): index)
-  })
+  query(<typst-mode-index-label>).map(item => item.value)
 }

@@ -34,13 +34,13 @@
   let pos = ids.position(id => id == doc.id)
   let links = ()
   if pos != none and pos > 0 {
-    links.push(link(entries.at(ids.at(pos - 1)).loc, [Previous]))
+    links.push(link(entries.find(index => index.label == ids.at(pos - 1)).loc, [Previous]))
   }
-  if doc.parent_id != doc.id and doc.parent_id in entries {
-    links.push(link(entries.at(doc.parent_id).loc, [Parent]))
+  if doc.parent_id != doc.id and entries.any(index => index.label == doc.parent_id) {
+    links.push(link(entries.find(index => index.label == doc.parent_id).loc, [Parent]))
   }
   if pos != none and pos + 1 < ids.len() {
-    links.push(link(entries.at(ids.at(pos + 1)).loc, [Next]))
+    links.push(link(entries.find(index => index.label == ids.at(pos + 1)).loc, [Next]))
   }
   if links.len() > 0 {
     html.elem("nav", attrs: (class: "tysty-navigation", aria-label: "Note navigation"), links.join(" · "))
@@ -54,7 +54,7 @@
   let docs = documents()
   let path = _breadcrumb-path(doc, docs)
   let crumbs = path.map(node => {
-    if node.id in entries { link(entries.at(node.id).loc, node.title) } else { node.title }
+    if entries.any(index => index.label == node.id) { link(entries.find(index => index.label == node.id).loc, node.title) } else { node.title }
   })
   html.elem("nav", attrs: (class: "tysty-breadcrumbs", aria-label: "Breadcrumb"), crumbs.join(" / "))
 }
@@ -148,11 +148,11 @@
   let entries = indexers()
   let ids = entities()
   let children = documents()
-    .filter(d => d.parent_id == doc.id and d.id != doc.id and d.id in ids and d.id in entries)
+    .filter(d => d.parent_id == doc.id and d.id != doc.id and d.id in ids and entries.any(index => index.label == d.id))
   if children.len() > 0 {
     _element("section", "tysty-children", [
       #heading(level: 2, outlined: false, title)
-      #list(..children.map(d => link(entries.at(d.id).loc, d.title)))
+      #list(..children.map(d => link(entries.find(index => index.label == d.id).loc, d.title)))
     ])
   }
 }
@@ -160,11 +160,11 @@
 #let render-tags(tree) = context {
   let entries = indexers()
   let ids = entities()
-  let docs = documents().filter(d => d.id in ids and d.id in entries)
+  let docs = documents().filter(d => d.id in ids and entries.any(index => index.label == d.id))
   let node(it) = {
     let items = it.children.values().map(node)
     for doc in docs.filter(d => d.tags.any(t => t.id == it.tag.id)) {
-      items.push(list.item(link(entries.at(doc.id).loc, doc.title)))
+      items.push(list.item(link(entries.find(index => index.label == doc.id).loc, doc.title)))
     }
     list.item(strong(it.tag.name) + if items.len() > 0 { list(..items) } else { [] })
   }
@@ -205,7 +205,7 @@
   ]
 }
 
-// Use as #show: html.render.bundle with --features html,bundle --format bundle.
+// Use as #show: html.bundle with --features html,bundle --format bundle.
 #let bundle(body, css: stylesheet) = {
   asset("tysty.css", bytes(css))
   body

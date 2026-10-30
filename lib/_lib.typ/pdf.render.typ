@@ -70,7 +70,7 @@
   let parts = _details(doc)
   let parent-id = doc.parent_id
   if parent-id != doc.id and parent-id in entities() {
-    parts.push(link(indexers().at(parent-id).loc, "[back]"))
+    parts.push(link(indexers().find(index => index.label == parent-id).loc, "[back]"))
   }
   block(above: 0.3em, below: 0.6em, text(size: 0.9em, fill: _meta-color, parts.join(" · ")))
   if doc.abstract != "" {
@@ -132,14 +132,14 @@
 
   let children = docs
     .filter(
-      d => d.parent_id == doc.id and d.id != doc.id and d.id in ids and d.id in entries,
+      d => d.parent_id == doc.id and d.id != doc.id and d.id in ids and entries.any(index => index.label == d.id),
     )
 
   if children.len() > 0 {
     heading(level: 2, outlined: false, title)
 
     for child in children {
-      _document-row(child, entries.at(child.id).loc)
+      _document-row(child, entries.find(index => index.label == child.id).loc)
     }
   }
 }
@@ -150,12 +150,12 @@
 #let render-tags(tree) = context {
   let entries = indexers()
   let ids = entities()
-  let docs = documents().filter(doc => doc.id in ids and doc.id in entries)
+  let docs = documents().filter(doc => doc.id in ids and entries.any(index => index.label == doc.id))
 
   let render-node(node) = {
     let items = node.children.values().map(child => render-node(child))
     for doc in docs.filter(doc => doc.tags.any(tag => tag.id == node.tag.id)) {
-      items.push(list.item(_document-row(doc, entries.at(doc.id).loc)))
+      items.push(list.item(_document-row(doc, entries.find(index => index.label == doc.id).loc)))
     }
     list.item(
       strong(node.tag.name)
@@ -192,10 +192,10 @@
           nav.push(link(tocs.first().location(), "[toc]"))
         }
         if pos != none and pos > 0 {
-          nav.push(link(entries.at(ids.at(pos - 1)).loc, "[prev]"))
+          nav.push(link(entries.find(index => index.label == ids.at(pos - 1)).loc, "[prev]"))
         }
         if pos != none and pos + 1 < ids.len() {
-          nav.push(link(entries.at(ids.at(pos + 1)).loc, "[next]"))
+          nav.push(link(entries.find(index => index.label == ids.at(pos + 1)).loc, "[next]"))
         }
 
         let parts = (doc.title, doc.date.display("[year]-[month]-[day]"))
@@ -204,8 +204,8 @@
         let path = _breadcrumb-path(doc, docs)
         let breadcrumbs = path.map(node => {
           let title = _truncate-middle(node.title)
-          if node.id in entries {
-            link(entries.at(node.id).loc, title)
+          if entries.any(index => index.label == node.id) {
+            link(entries.find(index => index.label == node.id).loc, title)
           } else {
             title
           }

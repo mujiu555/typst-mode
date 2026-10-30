@@ -68,7 +68,7 @@ implementation. The cache is available during module initialization.
 #import "lib/_lib.typ/lib.typ": *
 // Top-level APIs automatically select PDF or HTML at the call site.
 // The render module provides the same automatic APIs as render.mkdoc, etc.
-// Explicit pdf.render.* and html.render.* APIs remain available.
+// Explicit pdf.* and html.* APIs remain available.
 // Export this source as HTML with: typst compile --features html notebook.typ notebook.html
 #show: template
 
@@ -161,25 +161,25 @@ implementation. The cache is available during module initialization.
 // typst compile --root . --features html,bundle --format bundle website.typ site
 // The output contains index.html, notes/motion.html, and tysty.css.
 // Bundle background and typography can be customized with:
-// #show: html.render.bundle.with(css: read("my-theme.css"))
+// #show: html.bundle.with(css: read("my-theme.css"))
 #import "lib/_lib.typ/lib.typ": *
 // At bundle scope, the automatic template emits the shared CSS asset.
 #show: template
 
-#html.render.page("index.html", title: "Notebook")[
+#html.page("index.html", title: "Notebook")[
   #meta(id: "home", title: [Notebook], authors: ("Alice",))
-  #html.render.mkcover()
-  #html.render.mkdoc[
-    Read #html.render.lookup("motion", [the motion note]).
-    #html.render.render-children([Notes])
+  #html.mkcover()
+  #html.mkdoc[
+    Read #html.lookup("motion", [the motion note]).
+    #html.render-children([Notes])
   ]
 ]
 
-#html.render.page("notes/motion.html", title: "Motion")[
+#html.page("notes/motion.html", title: "Motion")[
   #meta(id: "motion", parent_id: "home", title: [Motion], authors: ("Alice",))
-  #html.render.mkdoc[
+  #html.mkdoc[
     Velocity describes how position changes over time.
-    Return to #html.render.lookup("home", [the notebook]).
+    Return to #html.lookup("home", [the notebook]).
   ]
 ]
 
@@ -189,9 +189,9 @@ implementation. The cache is available during module initialization.
 // Each page links to the shared CSS using its relative output path.
 //
 // For single-file HTML, omit bundle and page, and use:
-// #show: html.render.template.with(title: "Notebook")
+// #show: html.template.with(title: "Notebook")
 // #meta(id: "home", title: [Notebook], authors: ())
-// #html.render.mkdoc[Hello]
+// #html.mkdoc[Hello]
 // Compile with: typst compile --features html website.typ website.html
 // template embeds CSS by default; css: read("my-theme.css") overrides it.
 ```
