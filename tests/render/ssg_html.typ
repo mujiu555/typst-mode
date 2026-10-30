@@ -5,6 +5,6 @@
 #ssg.render.mkdoc[Fallback body.]
 #context {
   assert.eq(indexers().keys(), ("single",))
-  assert.eq((ssg.render.entities.final)(), ())
-  assert.eq((html.render.entities.final)(), ("single",))
+  assert.eq(ssg.render.entities(), ())
+  assert.eq(html.render.entities(), ("single",))
 }

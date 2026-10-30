@@ -48,7 +48,7 @@ by the following cases:
 | `html.render.template/mkcover/mkdoc/embed/lookup/render-children/render-tags/page/bundle` | `render/html_single`, `render/html_bundle`, `render/auto_bundle`, `reject/render/page_invalid_path` |
 | `html.render.stylesheet/section-outline/section-outlines` | `api/exports`, generated section outline checks in `render/ssg` |
 | `ssg.mkoutline`, `ssg.ref`, `ssg.render.route/mkdoc/embed/is-bundle-output/entities` | `render/ssg`, `render/ssg_ref`, `render/ssg_html`, `reject/render/ssg_ref_unrendered` |
-| Shared renderer `entities`, `file_base` state | `render/auto_bundle`, `api/entry` |
+| Shared renderer `entities()` query, `file_base` state | `render/auto_bundle`, `api/entry` |
 
 The renderer aliases are also checked for function identity in `api/exports`, so
 behavior tests for a top-level alias cover the corresponding `render.*` alias.
@@ -66,5 +66,35 @@ Obsolete UUID v5 vectors have been replaced by FNV-1a container vectors. The
 old duplicate cover-title regression and documentation/package text-presence
 checks have been removed. Unknown-field regressions now live under
 `reject/record/`. SSG uses `template` as its document wrapper; `entry` requires
-metadata arguments. PDF and HTML renderer `entities` currently share a store,
+metadata arguments. PDF and HTML renderer `entities()` query the same metadata label,
 which the mixed bundle test verifies.
+
+## Performance profiling
+
+Use the same isolated package and target selection as the correctness suite:
+
+```sh
+node tests/run.mjs --profile art api render
+```
+
+Each compilation prints elapsed wall time and writes a `*.trace.json` beside
+its output in the reported temporary directory. These traces come from Typst's
+standard `compile --timings <output.json>` option. Open a trace in
+[Perfetto](https://ui.perfetto.dev) to inspect compilation phases and source
+locations. Profiling also runs the usual correctness and output checks.
+
+For before/after measurements, use the same Typst version, machine, fonts,
+fixtures, output target, and job count. Run one warm-up, then at least five
+independent runs of the same selected tests; compare medians and retain the
+range. Do not run competing builds concurrently. These are fresh-process
+compilations with potentially warm OS caches, not incremental editor timings.
+Trace collection adds overhead: use normal compilations for headline latency
+and traces to locate hotspots. Record `typst --version`, the revision, command,
+and environment with results. For a single controlled compilation, reuse the
+runner's printed package directory and pass `--jobs 1` and `--timings` directly
+to `typst compile`; measure uninstrumented wall time with your shell's `time`.
+
+Parent metadata fixtures under `art/parent_*` verify that declarations preserve
+parent IDs, including unresolved and cyclic relationships. Traversal errors are
+tested where rendering actually follows parents (for example,
+`reject/render/breadcrumb_cycle.typ`).

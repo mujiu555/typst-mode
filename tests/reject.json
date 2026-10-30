@@ -35,8 +35,6 @@
   "reject/art/meta_type_title.typ": "assertion failed: field `title`:`content` do not match `\"plain string\"`",
   "reject/art/meta_type_tlb.typ": "assertion failed: field `tlb`:`dictionary` do not match `()`",
   "reject/art/meta_type_version.typ": "assertion failed: field `version`:`str` do not match `5`",
-  "reject/art/parent_cycle.typ": "Cyclic parent relationship:",
-  "reject/art/parent_unresolved.typ": "Unresolved document: missing",
   "reject/doc/current_leave_root.typ": "assertion failed: Cannot leave the root document scope",
   "reject/enum/method_name_collision.typ": "assertion failed: name `payload` conflicts with a reserved name or data field",
   "reject/enum/new_wrong_payload.typ": "assertion failed: variant `a`: expected int, got str",
@@ -65,5 +63,6 @@
   "reject/uid/namespace_bytes.typ": "assertion failed: uid namespace must contain 16 bytes",
   "reject/uid/namespace_hex.typ": "assertion failed: uid namespace must have 8-4-4-4-12 hexadecimal form",
   "reject/uid/namespace_text.typ": "assertion failed: uid namespace must have 8-4-4-4-12 hexadecimal form",
-  "reject/uid/namespace_type.typ": "assertion failed: uid namespace must be an identifier string or bytes"
+  "reject/uid/namespace_type.typ": "assertion failed: uid namespace must be an identifier string or bytes",
+  "reject/render/breadcrumb_cycle.typ": "Breadcrumb path exceeds rendered document count:"
 }

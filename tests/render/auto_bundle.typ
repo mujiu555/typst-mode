@@ -10,8 +10,8 @@
   #meta(id: "print", title: [Auto PDF], authors: ())
   #mkdoc[Read #lookup("web", [the HTML page]).]
   #context {
-    assert.eq((html.render.entities.final)(), ("web", "print"))
-    assert.eq((pdf.render.entities.final)(), ("web", "print"))
+    assert.eq(html.render.entities(), ("web", "print"))
+    assert.eq(pdf.render.entities(), ("web", "print"))
     assert.eq(backlinks("print").first().ctx.payload, "web")
     assert.eq(backlinks("web").first().ctx.payload, "print")
   }

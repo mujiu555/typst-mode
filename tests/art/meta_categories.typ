@@ -13,7 +13,7 @@
 )
 #for value in variants { meta(id: value.variant, title: [Category], authors: (), category: value) }
 #context {
- let docs = (documents.final)()
+ let docs = documents()
  assert.eq(docs.len(), variants.len())
- for value in variants { assert.eq((docs.at(value.variant).category.fields)(), (value.fields)()) }
+ for value in variants { assert.eq((docs.find(doc => doc.id == value.variant).category.fields)(), (value.fields)()) }
 }

@@ -29,6 +29,6 @@
 ]
 #context {
   assert.eq((current.get)().id, "home")
-  assert.eq((ssg.render.entities.final)(), ("home", "research", "review"))
-  assert.eq((documents.final)().review.parent_id, "research")
+  assert.eq(ssg.render.entities(), ("home", "research", "review"))
+  assert.eq(documents().find(doc => doc.id == "review").parent_id, "research")
 }

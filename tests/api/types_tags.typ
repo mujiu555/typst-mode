@@ -29,5 +29,5 @@
   assert.eq((physics.get-doc)().map(d => d.id), ("child",))
   assert.eq((tree.tag.get-doc)(), ())
   assert.eq((child.get-doc)(), ())
-  assert.eq((documents.final)().root.authors.first().home, alice.home)
+  assert.eq(documents().find(doc => doc.id == "root").authors.first().home, alice.home)
 }

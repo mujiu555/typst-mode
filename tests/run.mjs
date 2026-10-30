@@ -13,7 +13,8 @@ const packages = join(output, 'packages');
 mkdirSync(join(packages, 'local', 'tysty'), { recursive: true });
 symlinkSync(root, join(packages, 'local', 'tysty', '0.1.0'), 'dir');
 const expectedErrors = JSON.parse(readFileSync(join(root, 'tests', 'reject.json'), 'utf8'));
-const filters = process.argv.slice(2);
+const profile = process.argv.includes('--profile');
+const filters = process.argv.slice(2).filter(arg => arg !== '--profile');
 function files(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name);
@@ -23,7 +24,7 @@ function files(dir) {
 function formats(path) {
   if (['render/ssg.typ', 'render/ssg_ref.typ', 'render/html_bundle.typ', 'render/auto_bundle.typ'].includes(path)) return ['bundle'];
   if (['render/html_single.typ', 'render/ssg_html.typ'].includes(path)) return ['html'];
-  if (['render/auto.typ', 'api/entry.typ'].includes(path)) return ['pdf', 'html'];
+  if (['render/auto.typ', 'api/entry.typ', 'reject/render/breadcrumb_cycle.typ'].includes(path)) return ['pdf', 'html'];
   return ['pdf'];
 }
 let passed = 0;
@@ -57,7 +58,10 @@ for (const input of files(join(root, 'tests')).sort()) {
   for (const format of formats(path)) {
     const destination = join(output, path.replaceAll('/', '-').replace(/\.typ$/, '.' + format));
     const args = ['compile', '--root', root, '--package-path', packages, '--features', 'html,bundle', '--format', format, '--diagnostic-format', 'short', input, destination];
+    if (profile) args.push('--timings', destination + '.trace.json');
+    const started = performance.now();
     const result = spawnSync('typst', args, { cwd: root, encoding: 'utf8', timeout: 60000 });
+    if (profile) console.log(path + ' (' + format + '): ' + (performance.now() - started).toFixed(1) + ' ms');
     const diagnostic = (result.stderr ?? '') + (result.stdout ?? '');
     const expected = expectedErrors[path];
     if (path.startsWith('reject/') && !expected) throw new Error(`Missing expected diagnostic: ${path}`);

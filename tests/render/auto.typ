@@ -19,5 +19,5 @@
   assert.eq(backlinks("child").len(), 1)
   assert.eq(backlinks("child").first().ctx.payload, "root")
   let active = if target() == "html" { html.render.entities } else { pdf.render.entities }
-  assert.eq((active.final)(), ("root", "child"))
+  assert.eq(active(), ("root", "child"))
 }

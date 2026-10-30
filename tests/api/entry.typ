@@ -11,9 +11,9 @@
 ]
 #context {
   assert.eq((current.get)().id, "root")
-  let docs = (documents.final)()
-  assert.eq(docs.root.parent_id, "root")
-  assert.eq(docs.child.parent_id, "root")
+  let docs = documents()
+  assert.eq(docs.find(doc => doc.id == "root").parent_id, "root")
+  assert.eq(docs.find(doc => doc.id == "child").parent_id, "root")
   assert.eq(indexers().keys(), ("root", "child"))
   assert.eq(backlinks("child").first().ctx.payload, "root")
   assert.eq((pdf.render.file_base.get)(), "https://example.com/notes/")
