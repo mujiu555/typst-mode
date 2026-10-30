@@ -14,10 +14,10 @@
   let docs = documents()
   assert.eq(docs.find(doc => doc.id == "root").parent_id, "root")
   assert.eq(docs.find(doc => doc.id == "child").parent_id, "root")
-  assert.eq(indexers().keys(), ("root", "child"))
+  assert.eq(indexers().map(index => index.label), ("root", "child"))
   assert.eq(backlinks("child").first().ctx.payload, "root")
-  assert.eq((pdf.render.file_base.get)(), "https://example.com/notes/")
-  assert.eq((html.render.file_base.get)(), "https://example.com/notes/")
+  assert.eq((pdf.file_base.get)(), "https://example.com/notes/")
+  assert.eq((html.file_base.get)(), "https://example.com/notes/")
   if target() == "paged" {
     assert(query(link).any(l => l.dest == "https://example.com/notes/child.typ"))
   }

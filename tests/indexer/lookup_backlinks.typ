@@ -10,5 +10,5 @@
  assert.eq(refs.map(r => r.content), ([First], [Second]))
  assert.eq(backlinks("missing"), ())
  assert.eq(query(link).len(), 2)
- for l in query(link) { assert.eq(l.dest, indexers().unit.loc) }
+ for l in query(link) { assert.eq(l.dest, indexers().first().loc) }
 }

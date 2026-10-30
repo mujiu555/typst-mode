@@ -9,7 +9,7 @@
  #metadata("PNG background") <png-background>
 ])
 #meta(id: "png-cover", title: [PNG cover], authors: (), cover_image: (img.data)(png))
-#pdf.render.mkcover()
+#pdf.mkcover()
 #context {
  assert(query(<png-background>).len() >= 1, message: "Background must be laid out")
  assert(query(image).len() >= 2, message: "PNG image elements must be laid out")

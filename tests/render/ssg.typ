@@ -4,12 +4,12 @@
 
 // Calculate routes before emitting bundle documents. Bundle pages are
 // top-level outputs; keep them outside another mkdoc body.
-#assert.eq(ssg.render.route("home", root: true), "index.html")
-#assert.eq(ssg.render.route("Research"), "research/index.html")
-#assert.eq(ssg.render.route("Lit Review", ancestors: ("Research",)), "research/lit-review/index.html")
-#assert.eq(ssg.render.route("  !!!  "), "untitled/index.html")
-#assert.eq(ssg.render.route("Guides/Setup"), "guides/setup/index.html")
-#assert.eq(ssg.render.route("中文 笔记"), "中文-笔记/index.html")
+#assert.eq(ssg.route("home", root: true), "index.html")
+#assert.eq(ssg.route("Research"), "research/index.html")
+#assert.eq(ssg.route("Lit Review", ancestors: ("Research",)), "research/lit-review/index.html")
+#assert.eq(ssg.route("  !!!  "), "untitled/index.html")
+#assert.eq(ssg.route("Guides/Setup"), "guides/setup/index.html")
+#assert.eq(ssg.route("中文 笔记"), "中文-笔记/index.html")
 
 #meta(id: "home", title: [Home], authors: ())
 #mkdoc[Home page.]
@@ -29,6 +29,6 @@
 ]
 #context {
   assert.eq((current.get)().id, "home")
-  assert.eq(ssg.render.entities(), ("home", "research", "review"))
+  assert.eq(ssg.entities(), ("home", "research", "review"))
   assert.eq(documents().find(doc => doc.id == "review").parent_id, "research")
 }

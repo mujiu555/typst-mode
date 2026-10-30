@@ -18,6 +18,6 @@
   assert.eq(backlinks("standalone").first().ctx.variant, "null")
   assert.eq(backlinks("child").len(), 1)
   assert.eq(backlinks("child").first().ctx.payload, "root")
-  let active = if target() == "html" { html.render.entities } else { pdf.render.entities }
+  let active = if target() == "html" { html.entities } else { pdf.entities }
   assert.eq(active(), ("root", "child"))
 }

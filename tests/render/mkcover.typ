@@ -4,9 +4,9 @@
 // Manual: typst compile --root . tests/render/mkcover.typ /tmp/typst-unit-test.pdf
 #import "@local/tysty:0.1.0": *
 #meta(id: "unit", title: [Title], authors: ("Alice",))
-#pdf.render.mkcover()
+#pdf.mkcover()
 #context {
  assert.eq(rendered-text().matches(regex("Title")).len(), 1)
  assert(rendered-text().contains("Title"))
- assert.eq(indexers(), (:), message: "Cover must not register a duplicate heading")
+ assert.eq(indexers(), (), message: "Cover must not register a duplicate heading")
 }

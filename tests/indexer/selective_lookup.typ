@@ -11,12 +11,12 @@ Ordinary target <unit>
 
 #context {
   let entries = indexers()
-  assert.eq(entries.keys(), ("unit", "unit:child"))
-  assert.eq(entries.unit.content, [Target])
-  assert.eq(entries.at("unit:child").content, [Child])
+  assert.eq(entries.map(index => index.label), ("unit", "unit:child"))
+  assert.eq(entries.first().content, [Target])
+  assert.eq(entries.at(1).content, [Child])
   let links = query(link)
   assert.eq(links.len(), 2)
-  assert.eq(links.at(0).dest, entries.unit.loc)
-  assert.eq(links.at(1).dest, entries.at("unit:child").loc)
-  assert.eq(entries.unit.loc.page(), 2)
+  assert.eq(links.at(0).dest, entries.first().loc)
+  assert.eq(links.at(1).dest, entries.at(1).loc)
+  assert.eq(entries.first().loc.page(), 2)
 }

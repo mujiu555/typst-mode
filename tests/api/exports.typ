@@ -11,12 +11,12 @@
 ) {
   assert.eq(top-level, namespaced)
 }
-#for renderer in (pdf.render, html.render) {
+#for renderer in (pdf, html) {
   for fn in (renderer.embed, renderer.lookup, renderer.mkcover, renderer.mkdoc, renderer.render-children, renderer.render-tags, renderer.template) {
     assert.eq(type(fn), function)
   }
 }
 #assert.eq(type(ssg.mkoutline), function)
 #assert.eq(type(ssg.ref), function)
-#assert.eq(type(html.render.stylesheet), str)
-#assert(html.render.stylesheet.len() > 0)
+#assert.eq(type(html.stylesheet), str)
+#assert(html.stylesheet.len() > 0)
