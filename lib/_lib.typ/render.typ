@@ -11,19 +11,19 @@
 }
 
 #let mkcover = _auto(_pdf.mkcover, _html.mkcover)
-#let embed = (..args) => context {
+#let embed(..args) = context {
   if target() == "bundle" or _ssg.is-bundle-output() { _ssg.embed(..args) } else if target() == "paged" {
     _pdf.embed(..args)
   } else { _html.embed(..args) }
 }
 
-#let mkdoc = (..args) => context {
+#let mkdoc(..args) = context {
   if target() == "bundle" { _ssg.mkdoc(..args) } else if target() == "paged" { _pdf.mkdoc(..args) } else {
     _html.mkdoc(..args)
   }
 }
 
-#let mkoutline = (..args) => context {
+#let mkoutline(..args) = context {
   if target() == "bundle" or _ssg.is-bundle-output() {
     _ssg.mkoutline(..args)
   } else {

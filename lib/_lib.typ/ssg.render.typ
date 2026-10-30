@@ -9,7 +9,7 @@
 // outer bundle target for automatic render helpers called inside a page.
 #let _bundle-output = _mkstate("5d162f87-0e2c-4264-87b7-78b8383ee73c", false)
 #let is-bundle-output = () => (_bundle-output.get)()
-#let entities = _mkstate("0a4d3ddb-f9f7-4343-bb68-b9cd28429263", ())
+#let entities() = query(<tysty-ssg-document>).map(item => item.value).dedup()
 #let _page-bodies = _mkstate("tysty-ssg-page-bodies", (:))
 
 // Create a stable route from explicit semantic ancestry. This is pure so the
@@ -21,7 +21,7 @@
     .split("/")
     .map(part => part.replace(regex("[^\\p{L}\\p{N}]+"), "-").trim("-"))
     .filter(part => part != "")
-    .join("/")
+    .join("/", default: "")
   if slug == "" { "untitled" } else { slug }
 }
 
@@ -35,7 +35,7 @@
 }
 
 #let _document-route(doc) = {
-  let docs = (documents.final)()
+  let docs = documents()
   let visited = ()
   let parts = ()
   let node = doc
@@ -44,7 +44,7 @@
     visited.push(node.id)
     if node.parent_id == node.id { break }
     parts.insert(0, _slug(node.id))
-    node = docs.at(node.parent_id)
+    node = docs.find(doc => doc.id == node.parent_id)
   }
   if parts.len() == 0 { "index.html" } else { parts.join("/") + "/index.html" }
 }
@@ -61,7 +61,7 @@
 
 // A route-aware outline of all registered documents, grouped by parent.
 #let _outline-node(doc, docs, generated, source, active-id) = {
-  let children = docs.values().filter(child => child.parent_id == doc.id and child.id != doc.id)
+  let children = docs.filter(child => child.parent_id == doc.id and child.id != doc.id)
   let href = _relative-route(_document-route(doc), source)
   let attrs = (href: href) + if doc.id == active-id { (aria-current: "page") } else { (:) }
   let label = if doc.id in generated {
@@ -78,11 +78,11 @@
 }
 
 #let mkoutline(depth: none, title: [Documents]) = context {
-  let docs = (documents.final)()
-  let generated = (entities.final)()
+  let docs = documents()
+  let generated = entities()
   let active = (current.get)()
   let source = _document-route(active)
-  let roots = docs.values().filter(doc => doc.parent_id == doc.id)
+  let roots = docs.filter(doc => doc.parent_id == doc.id)
   html.elem("nav", attrs: (class: "tysty-site-outline", aria-label: "Site outline"), [
     #html.elem("h2", title)
     #html.elem("ul", roots.map(doc => _outline-node(doc, docs, generated, source, active.id)).join())
@@ -91,9 +91,9 @@
 
 // Embed a generated page's Typst body by its document label.
 #let ref(label) = context {
-  let docs = (documents.final)()
-  let doc = docs.at(label)
-  let generated = (entities.final)()
+  let docs = documents()
+  let doc = docs.find(doc => doc.id == label)
+  let generated = entities()
   assert(label in generated, message: "SSG page is registered but has not been generated: `" + label + "`")
   let body = (_page-bodies.final)().at(label)
   (current.enter)()
@@ -108,7 +108,7 @@
   if target() == "bundle" {
     (_bundle-output.update)(_ => true)
     let doc = (current.get)()
-    (entities.update)(ids => if doc.id in ids { ids } else { ids + (doc.id,) })
+    [#metadata(doc.id) <tysty-ssg-document>]
     (_page-bodies.update)(pages => pages + ((doc.id): body))
     let path = _document-route(doc)
     let depth = path.split("/").len() - 1

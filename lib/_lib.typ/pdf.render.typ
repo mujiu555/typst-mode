@@ -5,7 +5,7 @@
 #import "state.typ": _mkstate
 #import "util.typ": _match
 #import "embed.typ": _embed
-#import "render.common.typ": entities, file_base
+#import "render.common.typ": entities, file_base, _breadcrumb-path
 
 #let embed(offset: true, body) = _embed(body, offset: offset)
 
@@ -59,9 +59,7 @@
 // Render the current note and register its id as a global index label.
 #let mkdoc(new-page: true, content) = context {
   let doc = (current.get)()
-  (entities.update)(dc => {
-    dc + (doc.id,)
-  })
+  [#metadata(doc.id) <tysty-rendered-document>]
   assert("id" in doc, message: "Call meta before mkheading")
   if new-page { pagebreak(weak: true) }
   // Register outside the heading body: outlines replay that body.
@@ -71,7 +69,7 @@
   )))
   let parts = _details(doc)
   let parent-id = doc.parent_id
-  if parent-id != doc.id and parent-id in (entities.final)() {
+  if parent-id != doc.id and parent-id in entities() {
     parts.push(link(indexers().at(parent-id).loc, "[back]"))
   }
   block(above: 0.3em, below: 0.6em, text(size: 0.9em, fill: _meta-color, parts.join(" · ")))
@@ -128,12 +126,11 @@
   title,
 ) = context {
   let doc = (current.get)()
-  let docs = (documents.final)()
+  let docs = documents()
   let entries = indexers()
-  let ids = (entities.final)()
+  let ids = entities()
 
   let children = docs
-    .values()
     .filter(
       d => d.parent_id == doc.id and d.id != doc.id and d.id in ids and d.id in entries,
     )
@@ -152,8 +149,8 @@
 // Read final metadata so this list can also precede the document headings.
 #let render-tags(tree) = context {
   let entries = indexers()
-  let ids = (entities.final)()
-  let docs = (documents.final)().values().filter(doc => doc.id in ids and doc.id in entries)
+  let ids = entities()
+  let docs = documents().filter(doc => doc.id in ids and doc.id in entries)
 
   let render-node(node) = {
     let items = node.children.values().map(child => render-node(child))
@@ -186,7 +183,7 @@
       let doc = (current.get)()
       if "id" in doc {
         let entries = indexers()
-        let ids = (entities.final)()
+        let ids = entities()
         let pos = ids.position(id => id == doc.id)
 
         let nav = ()
@@ -203,23 +200,16 @@
 
         let parts = (doc.title, doc.date.display("[year]-[month]-[day]"))
 
-        let breadcrumbs = ()
-        let id = doc.id
-        let docs = (documents.final)()
-        while true {
-          let node = docs.at(id)
+        let docs = documents()
+        let path = _breadcrumb-path(doc, docs)
+        let breadcrumbs = path.map(node => {
           let title = _truncate-middle(node.title)
-          let item = if id in entries {
-            link(entries.at(id).loc, title)
+          if node.id in entries {
+            link(entries.at(node.id).loc, title)
           } else {
             title
           }
-          breadcrumbs.insert(0, item)
-          if node.parent_id == id {
-            break
-          }
-          id = node.parent_id
-        }
+        })
 
         grid(
           columns: (auto, 1fr),

@@ -1,6 +1,6 @@
 #import "doc.typ": current, documents
 #import "indexer.typ": indexers, mkindex
-#import "render.common.typ": entities, file_base, lookup
+#import "render.common.typ": entities, file_base, lookup, _breadcrumb-path
 #import "state.typ": _mkstate
 #import "embed.typ": _embed
 
@@ -30,7 +30,7 @@
 // Navigation uses plain links: rendering a menu must not create backlinks.
 #let _navigation(doc) = context {
   let entries = indexers()
-  let ids = (entities.final)()
+  let ids = entities()
   let pos = ids.position(id => id == doc.id)
   let links = ()
   if pos != none and pos > 0 {
@@ -51,15 +51,11 @@
 
 #let _breadcrumbs(doc) = context {
   let entries = indexers()
-  let docs = (documents.final)()
-  let crumbs = ()
-  let id = doc.id
-  while true {
-    let node = docs.at(id)
-    crumbs.insert(0, if id in entries { link(entries.at(id).loc, node.title) } else { node.title })
-    if node.parent_id == id { break }
-    id = node.parent_id
-  }
+  let docs = documents()
+  let path = _breadcrumb-path(doc, docs)
+  let crumbs = path.map(node => {
+    if node.id in entries { link(entries.at(node.id).loc, node.title) } else { node.title }
+  })
   html.elem("nav", attrs: (class: "tysty-breadcrumbs", aria-label: "Breadcrumb"), crumbs.join(" / "))
 }
 
@@ -85,7 +81,7 @@
 // new-page is accepted for shared PDF/HTML source; HTML flows continuously.
 #let mkdoc(new-page: true, ssg: false, outline: none, content) = context {
   let doc = (current.get)()
-  (entities.update)(ids => ids + (doc.id,))
+  [#metadata(doc.id) <tysty-rendered-document>]
   let article = _element("article", "tysty-note", [
     #mkindex(doc.id, heading(depth: 1, [
       #doc.title
@@ -150,9 +146,8 @@
 #let render-children(title) = context {
   let doc = (current.get)()
   let entries = indexers()
-  let ids = (entities.final)()
-  let children = (documents.final)()
-    .values()
+  let ids = entities()
+  let children = documents()
     .filter(d => d.parent_id == doc.id and d.id != doc.id and d.id in ids and d.id in entries)
   if children.len() > 0 {
     _element("section", "tysty-children", [
@@ -164,8 +159,8 @@
 
 #let render-tags(tree) = context {
   let entries = indexers()
-  let ids = (entities.final)()
-  let docs = (documents.final)().values().filter(d => d.id in ids and d.id in entries)
+  let ids = entities()
+  let docs = documents().filter(d => d.id in ids and d.id in entries)
   let node(it) = {
     let items = it.children.values().map(node)
     for doc in docs.filter(d => d.tags.any(t => t.id == it.tag.id)) {

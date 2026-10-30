@@ -13,10 +13,24 @@
   )
 }
 
-#let entities = _mkstate(
-  "ac70da6c-0504-423b-b152-b40b80ffc95f",
-  (),
-)
+// HTML and PDF share the rendered-document sequence.
+#let entities() = query(<tysty-rendered-document>).map(item => item.value)
+
+// Validate ancestry before constructing any breadcrumb content.
+#let _breadcrumb-path(doc, docs) = {
+  let limit = query(<tysty-rendered-document>).len()
+  let path = ()
+  let node = doc
+  while true {
+    path.push(node)
+    if path.len() > limit {
+      panic("Breadcrumb path exceeds rendered document count: " + doc.id)
+    }
+    if node.parent_id == node.id { break }
+    node = docs.find(doc => doc.id == node.parent_id)
+  }
+  path.rev()
+}
 
 // Both renderers attach the caller's document when one has been declared.
 // The underlying indexer remains usable without document metadata.

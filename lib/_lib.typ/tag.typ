@@ -40,7 +40,7 @@
     )
   },
   get-doc: self => {
-    (documents.final)().values().filter(doc => doc.tags.any(t => t.id == self.id))
+    documents().filter(doc => doc.tags.any(t => t.id == self.id))
   },
 )
 

@@ -53,11 +53,16 @@
   // field must have a explicit type, if you need null for a field, use enum
   for (f, ty) in self._fields {
     let v = rest.at(f, default: none)
-    assert(v != none, message: "field `" + f + "`: not exist:" + repr(rest))
-    assert(
-      _match(ty, v),
-      message: "field `" + f + "`:" + "`" + repr(ty) + "` do not match `" + repr(v) + "`",
-    )
+    // Format potentially large values only on the failure path.
+    if v == none {
+      assert(false, message: "field `" + f + "`: not exist:" + repr(rest))
+    }
+    if not _match(ty, v) {
+      assert(
+        false,
+        message: "field `" + f + "`:" + "`" + repr(ty) + "` do not match `" + repr(v) + "`",
+      )
+    }
     instance.insert(f, v)
   }
 

@@ -7,12 +7,8 @@
 #import "enum.typ": enumerator
 #import "state.typ": _mkstate
 
-// Global store of labels: name -> index entry. A fresh `_state` slot is
-// used so it does not collide with the other modules' slots.
-#let _labels = _mkstate(
-  "adf192e3-4b21-4d51-b218-93dbee5b0b15",
-  (:),
-)
+// Namespace labels for selective queries independent of ordinary document labels.
+#let _index-selector(name) = std.label("typst-mode-index:" + name)
 #let _refrecs = _mkstate(
   "85de9db3-3669-4e67-99a3-4658abe657a9",
   (:),
@@ -62,16 +58,16 @@
       content: content,
     )
 
-    (_labels.update)(cont => {
-      cont + ((label): index)
-    })
-    [#metadata(label) <typst-mode-index-label>]
+    // The shared marker enumerates entries; the named marker supports targeted
+    // queries without collecting and filtering every index entry.
+    [#metadata(index) <typst-mode-index-label>]
+    [#metadata(index)#_index-selector(label)]
     content
   }
   // Keep validation separate from registration so a failed validation cannot
-  // remove the state update and oscillate between layout passes.
+  // remove the metadata and oscillate between layout passes.
   context {
-    let matches = query(<typst-mode-index-label>).filter(m => m.value == label)
+    let matches = query(_index-selector(label))
     assert(matches.len() <= 1, message: "ERROR: duplicate label: `" + label + "`")
   }
 }
@@ -79,7 +75,9 @@
 // Look up a previously registered label and render a link to it.
 #let _lookup(label, content, doc_id: auto) = context {
   let loc = here()
-  let cont = (_labels.final)().at(label)
+  let matches = query(_index-selector(label))
+  assert(matches.len() > 0, message: "ERROR: unknown label: `" + label + "`")
+  let cont = matches.first().value
 
   (_refrecs.update)(
     recs => (
@@ -109,5 +107,8 @@
 }
 
 #let indexers() = {
-  (_labels.final)()
+  query(<typst-mode-index-label>).fold((:), (entries, item) => {
+    let index = item.value
+    entries + ((index.label): index)
+  })
 }

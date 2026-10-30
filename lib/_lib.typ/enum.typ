@@ -43,10 +43,12 @@
   let expected = self._variants.at(variant)
   let new = if type(expected) == type {
     it => {
-      assert(
-        _match(expected, it),
-        message: "variant `" + variant + "`: expected " + repr(expected) + ", got " + repr(type(it)),
-      )
+      if not _match(expected, it) {
+        assert(
+          false,
+          message: "variant `" + variant + "`: expected " + repr(expected) + ", got " + repr(type(it)),
+        )
+      }
       it
     }
   } else {

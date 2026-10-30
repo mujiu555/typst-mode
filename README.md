@@ -37,6 +37,27 @@ Root: /                         ; Project root
 +- typst.toml                   ; library spec
 ```
 
+## UID identifiers
+
+`uid(namespace, name)` uses pure Typst FNV-1a 32 with native integer bit
+operations. These identifiers are **non-standard UUIDs that borrow the UUID
+container**, not UUID v5. The input is the namespace's 16 bytes followed by the
+name's UTF-8 bytes (or raw bytes). Names are preserved without normalization.
+The initial hash is 2166136261; each byte is XORed into it, then multiplied by
+16777619 modulo 2^32.
+
+The result is `hhhhhhhh-0000-8000-8000-000000000000`, where `hhhhhhhh` is the
+lowercase, zero-padded 32-bit hash. The remaining fields are fixed formatting;
+they add no entropy. The effective hash space is only 32 bits, so collisions are
+possible; this is not a cryptographic hash or a uniqueness guarantee. Namespace
+strings remain case-insensitive, and 16-byte namespaces are also accepted.
+Existing UUID v5 values and all derived IDs change with this algorithm.
+
+Built-in identifiers use the precomputed FNV-1a 32 table in
+`lib/_lib.typ/uid.builtin.json`. Cache keys include the complete namespace and
+name; inputs absent from the table are computed with the same pure Typst
+implementation. The cache is available during module initialization.
+
 ## Usage
 
 ```typst
@@ -181,10 +202,9 @@ Root: /                         ; Project root
 // Save as site.typ. Requires Typst 0.15+.
 // Compile with: typst compile --root . --features html,bundle --format bundle site.typ output
 #import "lib/_lib.typ/lib.typ": *
-#show: render.entry
+#show: template
 
-// entry wraps the whole source document. Declare and render the root page
-// explicitly, just like the child pages below.
+// Declare and render the root page explicitly, just like the child pages below.
 #meta(id: "home", title: [Notebook], authors: ())
 #mkdoc[Entry page]
 
@@ -227,6 +247,9 @@ Root: /                         ; Project root
 
 You may pull all repository and walk through any part you interested in.
 Make Pr if you have found any problem or have method to improve those notes.
+
+Run `node tests/run.mjs` to test this checkout as `@local/tysty:0.1.0`.
+See [tests/README.md](tests/README.md) for API coverage and test targets.
 
 ## License
 

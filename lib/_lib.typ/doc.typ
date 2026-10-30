@@ -3,7 +3,7 @@
 //
 // `meta(...)` in art.typ declares a document: it builds a `_core_doc` record from the
 // given metadata, attaches it to any
-// tags, registers it in the `documents` store, and makes it the `current`
+// tags, emits queryable metadata, and makes it the `current`
 // document. Documents are referenced by id elsewhere (e.g. by tag.typ and
 // by a future bibliography/record layer).
 
@@ -11,13 +11,8 @@
 #import "record.typ": record
 #import "state.typ": _mkstate
 
-// Global stores (see state.typ):
-//   documents — id -> `_Core_doc` map of every declared document
-//   current   — the most recently declared document
-#let documents = _mkstate(
-  "f12cabee-4a71-4049-b99a-e91e4bb8ee32",
-  (:),
-)
+// Query complete document records in document order.
+#let documents() = query(<tysty-document>).map(item => item.value)
 
 #let _current_stack = _mkstate(
   "4425dff9-79cf-48e7-8868-1a99688d1635",

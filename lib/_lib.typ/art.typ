@@ -3,28 +3,7 @@
 #import "tag.typ": tag
 #import "util.typ": _match
 
-#let _validate-parent(docs, id) = {
-  let visited = ()
-  let current = id
-
-  while true {
-    assert(
-      current in docs,
-      message: "Unresolved document: " + current,
-    )
-    assert(
-      current not in visited,
-      message: "Cyclic parent relationship: " + repr(visited + (current,)),
-    )
-
-    visited.push(current)
-    let parent = docs.at(current).parent_id
-    if parent == current {
-      break
-    }
-    current = parent
-  }
-}
+#let _document-selector(id) = std.label("tysty-document:" + id)
 
 // Declare a document. Most arguments map 1:1 onto `_Core_doc` fields and
 #let meta(
@@ -95,23 +74,17 @@
       )
     }
 
-    // Register under its id, and make it the current document
-    (documents.update)(dc => {
-      dc + ((id): doc)
-    })
+    // Publish the complete record for document queries.
+    [#metadata(doc) <tysty-document>]
+    // A dedicated marker lets duplicate checks query only this document ID.
+    [#metadata(id)#_document-selector(id)]
 
     (current.update)(
       doc,
     )
-
-    [#metadata(id) <typst-mode-document-id>]
   }
   context {
-    let matches = query(<typst-mode-document-id>).filter(m => m.value == id)
+    let matches = query(_document-selector(id))
     assert(matches.len() <= 1, message: "ERROR: duplicate document id: `" + id + "`")
-  }
-  context {
-    let docs = (documents.final)()
-    _validate-parent(docs, id)
   }
 }
