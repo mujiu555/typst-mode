@@ -1,14 +1,12 @@
 #import "doc.typ": current
-#import "ssg.render.typ": is-bundle-output
-
 // #embed(include "child.typ") resolves relative paths at the call site.
-#let embed(body) = {
+#let _embed(body, offset: true) = {
   (current.enter)()
   context {
-    if target() == "bundle" or is-bundle-output() {
+    if offset {
+      set heading(offset: heading.offset + 1)
       body
     } else {
-      set heading(offset: heading.offset + 1)
       body
     }
   }

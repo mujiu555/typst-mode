@@ -2,6 +2,9 @@
 #import "art.typ": meta
 #import "doc.typ": current, documents
 #import "state.typ": _mkstate
+#import "embed.typ": _embed
+
+#let embed(offset: false, body) = _embed(body, offset: offset)
 
 // `document()` switches nested page content to the HTML target, so retain the
 // outer bundle target for automatic render helpers called inside a page.

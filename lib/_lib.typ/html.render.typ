@@ -2,6 +2,9 @@
 #import "indexer.typ": indexers, mkindex
 #import "render.common.typ": lookup
 #import "state.typ": _mkstate
+#import "embed.typ": _embed
+
+#let embed(offset: false, body) = _embed(body, offset: offset)
 
 // This module uses Typst's built-in html; the public html namespace wraps it.
 #let stylesheet = read("html.render.css")

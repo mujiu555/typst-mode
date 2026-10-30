@@ -4,6 +4,9 @@
 #import "render.common.typ": lookup
 #import "state.typ": _mkstate
 #import "util.typ": _match
+#import "embed.typ": _embed
+
+#let embed(offset: true, body) = _embed(body, offset: offset)
 
 #let entities = _mkstate(
   "ac70da6c-0504-423b-b152-b40b80ffc95f",

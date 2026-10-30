@@ -10,6 +10,11 @@
 }
 
 #let mkcover = _auto(_pdf.mkcover, _html.mkcover)
+#let embed = (..args) => context {
+  if target() == "bundle" or _ssg.is-bundle-output() { _ssg.embed(..args) }
+  else if target() == "paged" { _pdf.embed(..args) }
+  else { _html.embed(..args) }
+}
 #let mkdoc = (..args) => context {
   if target() == "bundle" { _ssg.mkdoc(..args) }
   else if target() == "paged" { _pdf.mkdoc(..args) }

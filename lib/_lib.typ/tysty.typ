@@ -7,6 +7,6 @@
 #import "html.typ" as html
 #import "ssg.typ" as ssg
 #import "render.typ" as render
-#import "render.typ": lookup, mkcover, mkdoc, mkoutline, render-children, render-tags, template
+#import "render.typ": embed, lookup, mkcover, mkdoc, mkoutline, render-children, render-tags, template
 #import "ssg.render.typ": entry
-#import "embed.typ": embed
+#import "embed.typ": _embed
