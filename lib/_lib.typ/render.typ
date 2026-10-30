@@ -48,6 +48,12 @@
 
 #let entry(..args, content) = context {
   let fields = arguments.named(args)
+  if not ("parent_id" in fields) {
+    let parent = (current.get)().at("id", default: auto)
+    if parent != auto {
+      fields.insert("parent_id", parent)
+    }
+  }
   meta(..fields) + mkdoc(content)
 }
 
