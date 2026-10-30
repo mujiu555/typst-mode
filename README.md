@@ -181,12 +181,12 @@ Root: /                         ; Project root
 // Save as site.typ. Requires Typst 0.15+.
 // Compile with: typst compile --root . --features html,bundle --format bundle site.typ output
 #import "lib/_lib.typ/lib.typ": *
-#show: ssg.render.site
+#show: render.entry
 
-// The entry declares the root document and lets mkdoc generate its route.
-#entry(id: "home", title: [Notebook], authors: ())[
-  Entry page
-]
+// entry wraps the whole source document. Declare and render the root page
+// explicitly, just like the child pages below.
+#meta(id: "home", title: [Notebook], authors: ())
+#mkdoc[Entry page]
 
 // An embed can declare and emit its own child page. The route is computed
 // from the document ID; nested ancestors become route directories.

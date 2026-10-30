@@ -5,18 +5,9 @@
 #import "state.typ": _mkstate
 #import "util.typ": _match
 #import "embed.typ": _embed
+#import "render.common.typ": entities, file_base
 
 #let embed(offset: true, body) = _embed(body, offset: offset)
-
-#let entities = _mkstate(
-  "ac70da6c-0504-423b-b152-b40b80ffc95f",
-  (),
-)
-
-#let file_base = _mkstate(
-  "c88ae13e-b0cd-4f84-b3e8-759903558a3d",
-  "",
-)
 
 #let _meta-color = rgb("#999")
 #let _nav-color = rgb("#555")
@@ -76,9 +67,7 @@
   // Register outside the heading body: outlines replay that body.
   mkindex(doc.id, block(below: 0.3em, heading(
     depth: 1,
-    text(weight: 600, doc.title)
-      + h(0.5em)
-      + link("file://" + (file_base.get)() + doc.file_path, _slug("[" + doc.id + "]")),
+    text(weight: 600, doc.title) + h(0.5em) + link((file_base.get)() + doc.file_path, _slug("[" + doc.id + "]")),
   )))
   let parts = _details(doc)
   let parent-id = doc.parent_id
@@ -97,9 +86,6 @@
   let doc = (current.get)()
   assert("id" in doc, message: "Call meta before mkcover")
   pagebreak(weak: true)
-  (file_base.update)(
-    path => doc.file_path,
-  )
   align(center)[
     #v(1fr)
     #if doc.cover_image.variant in ("path", "data") {

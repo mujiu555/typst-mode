@@ -1,6 +1,6 @@
 #import "doc.typ": current, documents
 #import "indexer.typ": indexers, mkindex
-#import "render.common.typ": lookup
+#import "render.common.typ": entities, file_base, lookup
 #import "state.typ": _mkstate
 #import "embed.typ": _embed
 
@@ -8,7 +8,6 @@
 
 // This module uses Typst's built-in html; the public html namespace wraps it.
 #let stylesheet = read("html.render.css")
-#let entities = _mkstate("f283d7de-3081-4649-99db-ed2695f5bdaa", ())
 #let section-outlines = _mkstate("ef875bf6-8365-4649-8558-0d4beaf5422c", (:))
 
 #let _element(tag, class, body) = html.elem(tag, attrs: (class: class), body)
@@ -93,7 +92,7 @@
     #if not ssg { _navigation(doc) }
     #if not ssg { _breadcrumbs(doc) }
     #if doc.file_path != "(no link (uri))" and doc.file_path != "" {
-      _element("p", "tysty-source", link(doc.file_path, [Source]))
+      _element("p", "tysty-source", link((file_base.get)() + doc.file_path, [Source]))
     }
     #if doc.abstract != "" { _element("p", "tysty-abstract", doc.abstract) }
     #show heading: it => {
