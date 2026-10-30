@@ -1,5 +1,4 @@
 #import "html.render.typ" as _html
-#import "art.typ": meta
 #import "doc.typ": current, documents
 #import "state.typ": _mkstate
 #import "embed.typ": _embed
@@ -130,11 +129,3 @@
   }
 }
 
-// Root entry declares metadata and emits its empty/root page. Child pages can
-// then be declared with ordinary meta + mkdoc inside sibling embed blocks.
-#let entry(..args, content) = {
-  let fields = arguments.named(args)
-  meta(..fields) + mkdoc(content)
-}
-
-#let site(body, css: _html.stylesheet) = _html.bundle(body, css: css)

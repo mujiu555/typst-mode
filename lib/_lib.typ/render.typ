@@ -2,6 +2,7 @@
 #import "html.render.typ" as _html
 #import "render.common.typ": lookup
 #import "ssg.render.typ" as _ssg
+#import "art.typ": meta
 
 // Resolve at the call site: a bundle may contain both HTML and paged documents.
 // PNG/SVG export and HTML frames also use Typst's "paged" target.
@@ -11,14 +12,14 @@
 
 #let mkcover = _auto(_pdf.mkcover, _html.mkcover)
 #let embed = (..args) => context {
-  if target() == "bundle" or _ssg.is-bundle-output() { _ssg.embed(..args) }
-  else if target() == "paged" { _pdf.embed(..args) }
-  else { _html.embed(..args) }
+  if target() == "bundle" or _ssg.is-bundle-output() { _ssg.embed(..args) } else if target() == "paged" {
+    _pdf.embed(..args)
+  } else { _html.embed(..args) }
 }
 #let mkdoc = (..args) => context {
-  if target() == "bundle" { _ssg.mkdoc(..args) }
-  else if target() == "paged" { _pdf.mkdoc(..args) }
-  else { _html.mkdoc(..args) }
+  if target() == "bundle" { _ssg.mkdoc(..args) } else if target() == "paged" { _pdf.mkdoc(..args) } else {
+    _html.mkdoc(..args)
+  }
 }
 #let mkoutline = (..args) => context {
   if target() == "bundle" or _ssg.is-bundle-output() {
@@ -40,3 +41,9 @@
     _pdf.template(body, ..options)
   }
 }
+
+#let entry(..args, content) = {
+  let fields = arguments.named(args)
+  meta(..fields) + mkdoc(content)
+}
+
